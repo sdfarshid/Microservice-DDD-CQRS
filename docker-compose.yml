@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  user_db:
+    image: postgres
+    container_name: user_service_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_PORT_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PORT_USER}
+      POSTGRES_DB: ${POSTGRES_PORT_USER}
+    ports:
+      - "${POSTGRES_PORT_USER}:5432"
+    volumes:
+      - user_postgres_data:/var/lib/postgresql/data:/var/lib/postgresql/data
+
+  user_app:
+      build:
+        context: ./services/User
+        dockerfile: Dockerfile.prod
+      container_name: user_service_app
+      depends_on:
+        - user_db
+      environment:
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_HOST_USER}
+        POSTGRES_HOST: ${POSTGRES_HOST_USER}
+        POSTGRES_PORT: ${POSTGRES_PORT_USER}
+        APP_PORT: ${APP_PORT_USER}
+      ports:
+        - "${APP_PORT_USER}:8000"
+      volumes:
+        - ./services/user:/app
+        - ./services/user/logs:/app/logs
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "10m"
+          max-file: "3"
+      command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${APP_PORT_USER}"]
+
+  product_db:
+    image: postgres
+    container_name: product_service_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_PRODUCT}
+    ports:
+      - "${POSTGRES_PORT_PRODUCT}:5432"
+    volumes:
+      - product_postgres_data:/var/lib/postgresql/data
+
+  product_app:
+    build:
+      context: ./services/Product
+      dockerfile: Dockerfile.prod
+    container_name: product_service_app
+    depends_on:
+      - product_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_PRODUCT}
+      POSTGRES_HOST: ${POSTGRES_HOST_PRODUCT}
+      POSTGRES_PORT: ${POSTGRES_PORT_PRODUCT}
+      APP_PORT: ${APP_PORT_PRODUCT}
+    ports:
+      - "${APP_PORT_PRODUCT}:8000"
+    volumes:
+      - ./services/product:/app
+      - ./services/product/logs:/app/logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${APP_PORT_PRODUCT}"]
+
+volumes:
+  user_postgres_data:
+  product_postgres_data:
+
