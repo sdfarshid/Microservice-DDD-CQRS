@@ -1,0 +1,6 @@
+/.idea
+.env
+/app/logs
+/app/logs/app.log
+app/config/public_key.pem
+app/config/private_key.pem
