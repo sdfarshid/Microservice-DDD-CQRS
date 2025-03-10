@@ -1,20 +1,29 @@
-import uuid
 import jwt
 import os
 from datetime import timedelta, datetime
 from pydantic import BaseModel
 
-from app.infrastructure.config import settings
+from app.config.config import settings
+
 
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-print(f"Base Path: {BASE_PATH}")
 
 PRIVATE_KEY_PATH = settings.PRIVATE_KEY_PATH
 PUBLIC_KEY_PATH = settings.PUBLIC_KEY_PATH
 
-with open(os.path.join(BASE_PATH, PRIVATE_KEY_PATH), "r") as f:
+private_key_full_path = os.path.join(BASE_PATH, PRIVATE_KEY_PATH)
+public_key_full_path = os.path.join(BASE_PATH, PUBLIC_KEY_PATH)
+
+if not os.path.exists(private_key_full_path):
+    raise FileNotFoundError(f"Private key file not found at: {private_key_full_path}")
+if not os.path.exists(public_key_full_path):
+    raise FileNotFoundError(f"Public key file not found at: {public_key_full_path}")
+
+
+
+with open(private_key_full_path, "r") as f:
     PRIVATE_KEY = f.read()
-with open(os.path.join(BASE_PATH, PUBLIC_KEY_PATH), "r") as f:
+with open(public_key_full_path, "r") as f:
     PUBLIC_KEY = f.read()
 
 

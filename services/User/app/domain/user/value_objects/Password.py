@@ -1,5 +1,4 @@
 from pydantic import BaseModel, field_validator
-from pydantic_core import core_schema
 
 
 class Password(BaseModel):

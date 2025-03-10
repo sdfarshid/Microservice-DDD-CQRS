@@ -3,11 +3,11 @@ from typing import Annotated
 from fastapi import APIRouter, Request, Depends, HTTPException
 from pydantic import EmailStr, BaseModel
 
-from app.domain.mixins.pagination import PaginationParams, get_pagination_params
-from app.domain.user.services.user_service import UserService
-from app.domain.user.value_objects.Email import Email
-from app.domain.user.value_objects.Password import Password
-from app.utilities.log import logger
+from ....domain.mixins.pagination import PaginationParams, get_pagination_params
+from ....domain.user.services.user_service import UserService
+from ....domain.user.value_objects.Email import Email
+from ....domain.user.value_objects.Password import Password
+from ....utilities.log import logger
 
 router = APIRouter()
 

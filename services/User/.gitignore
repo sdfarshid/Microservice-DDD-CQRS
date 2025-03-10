@@ -2,5 +2,6 @@
 .env
 /app/logs
 /app/logs/app.log
+__pycache__
 app/config/public_key.pem
 app/config/private_key.pem
