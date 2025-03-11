@@ -5,3 +5,12 @@
 __pycache__
 app/config/public_key.pem
 app/config/private_key.pem
+._*
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.git
+.gitignore
