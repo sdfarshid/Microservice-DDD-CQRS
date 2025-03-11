@@ -5,7 +5,7 @@ T = TypeVar("T")
 R = TypeVar("R")
 
 
-class ICommandHandler(ABC, Generic[T, R]):
+class IQueryHandler(ABC, Generic[T, R]):
     @abstractmethod
-    async def handle(self, command: T) -> R:
+    async def handle(self, query: T) -> R:
         pass
