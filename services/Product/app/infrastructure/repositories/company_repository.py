@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import Depends
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.database.models.company import CompanyDBModel
@@ -18,5 +19,5 @@ class CompanyRepository(ICompanyRepository):
         return company
 
     async def get_company_by_id(self, company_id: UUID) -> CompanyDBModel:
-        self.db.add(company_id)
-        pass
+        result = await self.db.execute(select(CompanyDBModel).where(CompanyDBModel.id == company_id))
+        return result.scalars().first()
