@@ -18,8 +18,11 @@ async def on_startup():
     print(" Running database initialization...")
     await init_db()
 
+
+
+
+
 @app.get("/")
 async def root():
     logger.debug("Root endpoint accessed")
     return {"message": "Hello World Farshid"}
-

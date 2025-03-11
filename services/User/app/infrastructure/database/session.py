@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 import logging
-
 from app.config.config import settings
 
 logger = logging.getLogger(__name__)
@@ -22,6 +21,9 @@ AsyncSessionLocal = sessionmaker(
 )
 
 Base = declarative_base()
+
+
+
 
 
 async def drop_all_tables():
