@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from app.domain.user.commands.user.create_user import CreateUserCommand
-from app.domain.user.handlers.interfaces.Iquery_handler import ICommandHandler
+from app.domain.user.handlers.interfaces.Icommand_handler import ICommandHandler
 from app.domain.user.models.user import User
 from app.infrastructure.mappers.user_mapper import UserMapper
 from app.infrastructure.repositories.Interfaces.Iuser_interface import IUserRepository

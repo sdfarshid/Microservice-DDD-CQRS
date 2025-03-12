@@ -4,8 +4,8 @@ from fastapi import Depends
 from app.domain.mixins.pagination import PaginationParams
 from app.domain.user.commands.user.create_user import CreateUserCommand
 from app.domain.user.handlers.user.create_user_handler import CreateUserHandler
-from app.domain.user.handlers.interfaces.Icommand_handler import IQueryHandler
-from app.domain.user.handlers.interfaces.Iquery_handler import ICommandHandler
+from app.domain.user.handlers.interfaces.Iquery_handler import IQueryHandler
+from app.domain.user.handlers.interfaces.Icommand_handler import ICommandHandler
 from app.domain.user.handlers.user.list_user_handler import list_user_handler
 from app.domain.user.models.user import User, UserResponse
 from app.domain.user.queries.list_users_query import ListUsersQuery

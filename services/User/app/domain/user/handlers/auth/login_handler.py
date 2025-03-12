@@ -1,8 +1,8 @@
 from fastapi import Depends
 
 from app.domain.user.commands.auth.login_user import LoginUserCommand
-from app.domain.user.handlers.interfaces.Icommand_handler import IQueryHandler
-from app.domain.user.handlers.interfaces.Iquery_handler import ICommandHandler, T, R
+from app.domain.user.handlers.interfaces.Iquery_handler import IQueryHandler
+from app.domain.user.handlers.interfaces.Icommand_handler import ICommandHandler, T, R
 from app.domain.user.handlers.user.get_user_by_email_handler import GetUserByEmailHandler
 from app.domain.user.models.user import User
 from app.domain.user.queries.get_user_by_email import GetUserByEmailQuery

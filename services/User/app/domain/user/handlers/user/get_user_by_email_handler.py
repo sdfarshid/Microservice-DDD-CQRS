@@ -1,6 +1,6 @@
 from fastapi import Depends
 
-from app.domain.user.handlers.interfaces.Icommand_handler import IQueryHandler
+from app.domain.user.handlers.interfaces.Iquery_handler import IQueryHandler
 from app.domain.user.models.user import User
 from app.domain.user.queries.get_user_by_email import GetUserByEmailQuery
 from app.infrastructure.mappers.user_mapper import UserMapper
