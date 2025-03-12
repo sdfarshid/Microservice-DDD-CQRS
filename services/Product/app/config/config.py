@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     @property
     def DATABASE_URL(self) -> PostgresDsn:
-        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST_PRODUCT}:{self.POSTGRES_PORT_PRODUCT}/{self.POSTGRES_DB_PRODUCT}"
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST_PRODUCT}:5432/{self.POSTGRES_DB_PRODUCT}"
 
 
 
