@@ -14,9 +14,14 @@ class CompanyRepository(ICompanyRepository):
         self.db = db
 
     async def add_company(self, company: CompanyDBModel) -> CompanyDBModel:
-        self.db.add(company)
-        await self.db.commit()
-        return company
+        try:
+            self.db.add(company)
+            await self.db.commit()
+            await self.db.refresh(company)
+            return company
+        except Exception as e:
+            await self.db.rollback()
+            raise e
 
     async def get_company_by_id(self, company_id: UUID) -> CompanyDBModel:
         result = await self.db.execute(select(CompanyDBModel).where(CompanyDBModel.id == company_id))

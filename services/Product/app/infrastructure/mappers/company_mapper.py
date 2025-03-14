@@ -1,3 +1,4 @@
+from app.domain.company.commands.create_company import CreateCompanyCommand
 from app.domain.company.models.company import Company
 from app.domain.company.models.value_objects.address import Address
 from app.domain.company.models.value_objects.company_name import CompanyName
@@ -6,6 +7,18 @@ from app.infrastructure.database.models.company import CompanyDBModel
 
 
 class CompanyMapper():
+
+    @staticmethod
+    def from_command(command: CreateCompanyCommand) -> Company:
+        return Company(
+            name=CompanyName(value=command.name),
+            provider_id=command.provider_id,
+            registration_number=RegistrationNumber(value=command.registration_number),
+            address=Address(value=command.address),
+            website=command.website,
+            status=command.status,
+        )
+
     @staticmethod
     def to_domain(orm_model: CompanyDBModel) -> Company:
         return Company(

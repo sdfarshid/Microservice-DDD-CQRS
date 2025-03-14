@@ -15,4 +15,4 @@ class Company(BaseModel, AuditMixin):
     registration_number: RegistrationNumber
     address: Address
     website: str | None = None
-    status: str
+    status: str = "active"
