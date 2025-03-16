@@ -8,5 +8,5 @@ R = TypeVar("R")
 class ICommandHandler(ABC, Generic[T, R]):
 
     @abstractmethod
-    async def handler(self, command: T) -> R:
+    async def handle(self, command: T) -> R:
         pass

@@ -16,7 +16,7 @@ class CreateCompanyHandler(ICommandHandler[Company, UUID]):
                  ):
         self.company_repository = company_repository
 
-    async def handler(self, companyDomainModel: Company) -> UUID:
+    async def handle(self, companyDomainModel: Company) -> UUID:
         try:
             companyDBModel = CompanyMapper.to_orm(companyDomainModel)
 

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Sequence
 from uuid import UUID
 
 from fastapi import Depends
@@ -33,7 +33,7 @@ class CompanyRepository(ICompanyRepository):
         )
         return result.scalars().one_or_none()
 
-    async def list_companies(self, pagination: PaginationParams) -> List[CompanyDBModel]:
+    async def list_companies(self, pagination: PaginationParams) -> Sequence[CompanyDBModel]:
         result = await self.db.execute(
             select(CompanyDBModel).offset(pagination.offset).limit(pagination.limit)
         )
@@ -64,7 +64,7 @@ class CompanyRepository(ICompanyRepository):
             await self.db.rollback()
             raise e
 
-    async def get_by_registration_number(self, registration_number: str) -> [CompanyDBModel , None]:
+    async def get_by_registration_number(self, registration_number: str) -> [CompanyDBModel, None]:
         result = await self.db.execute(
             select(CompanyDBModel).where(CompanyDBModel.registration_number == registration_number)
         )

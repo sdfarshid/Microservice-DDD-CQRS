@@ -12,7 +12,7 @@ class GetCompanyHandler(IQueryHandler[GetCompanyByIdQuery, Company]):
     def __init__(self, company_repository: ICompanyRepository = Depends(CompanyRepository)):
         self.company_repository = company_repository
 
-    async def handler(self, query: GetCompanyByIdQuery) -> R:
+    async def handle(self, query: GetCompanyByIdQuery) -> R:
         company_db = await self.company_repository.get_company_by_id(query.company_id)
         print(company_db)
         if not company_db:
