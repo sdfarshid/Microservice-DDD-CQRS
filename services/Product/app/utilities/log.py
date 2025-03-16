@@ -21,3 +21,11 @@ if not logger.hasHandlers():
     logger.addHandler(stream_handler)
 
 logger.debug("Logger initialized!")
+
+
+def DebugWaring(message):
+    logger.debug(f"⚠️⚠️{message}")
+
+
+def DebugError(message):
+    logger.debug(f"🚨️{message}")

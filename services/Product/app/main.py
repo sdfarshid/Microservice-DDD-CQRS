@@ -6,6 +6,7 @@ from app.utilities.log import logger
 
 app = FastAPI(title="User Service",
               version="1.0",
+              debug=True,
               on_startup=[lambda: logger.info("Starting User Service")],
               on_shutdown=[lambda: logger.info("Shutting down User Service")]
               )
