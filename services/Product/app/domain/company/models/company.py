@@ -8,6 +8,7 @@ from app.domain.company.models.value_objects.registration_number import Registra
 from app.domain.mixins.audit_mixin import AuditMixin
 
 
+
 class Company(BaseModel, AuditMixin):
     id: UUID = uuid4()
     name: CompanyName

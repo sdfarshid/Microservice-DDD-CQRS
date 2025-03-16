@@ -7,5 +7,5 @@ R = TypeVar("R")
 
 class IQueryHandler(ABC, Generic[T, R]):
     @abstractmethod
-    async def handle(self, query: T) -> R:
+    async def handler(self, query: T) -> R:
         pass
