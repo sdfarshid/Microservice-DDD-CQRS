@@ -77,28 +77,3 @@ class CompanyMapper():
             status=domain_model.status,
         )
 
-    @staticmethod
-    def update_from_command(company: Company, command: UpdateCompanyCommand) -> Company:
-        return Company(
-            id=company.id,
-            name=CompanyName(value=command.name) if command.name is not None else company.name,
-            provider_id=company.provider_id,
-            registration_number=RegistrationNumber(value=command.registration_number) if command.registration_number is not None else company.registration_number,
-            address=Address(value=command.address) if command.address is not None else company.address,
-            website=command.website if command.website is not None else company.website,
-            status=command.status if command.status is not None else company.status,
-            created_at=company.created_at,
-            updated_at=datetime.now()
-        )
-
-    @staticmethod
-    def to_update_dict(domain_model: Company) -> dict:
-        return {
-            "name": domain_model.name.value,
-            "registration_number": domain_model.registration_number.value,
-            "address": domain_model.address.value,
-            "website": domain_model.website,
-            "status": domain_model.status,
-            "updated_at": datetime.now()
-        }
-

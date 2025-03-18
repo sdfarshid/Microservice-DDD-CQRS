@@ -57,7 +57,7 @@ async def get_company(company_id: UUID, service: ProductServiceDependency):
 
 
 @router.patch("/{company_id}", response_model=CompanyResponse)
-async def get_company(updateData: UpdateCompanyCommand, service: ProductServiceDependency):
+async def update_company(updateData: UpdateCompanyCommand, service: ProductServiceDependency):
     try:
         return await service.update_company(updateData)
     except ValueError as value_error:

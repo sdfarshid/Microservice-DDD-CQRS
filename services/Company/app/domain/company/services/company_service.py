@@ -59,7 +59,7 @@ class CompanyService:
         if not company:
             raise ValueError("Company not found")
 
-        updated_company = CompanyMapper.update_from_command(company, command)
+        updated_company = command.to_update_dict(command.update_to_company(company))
         return await self.update_company_handler.handle((command.company_id, updated_company))
 
     async def delete_company(self, company_id: uuid) -> bool:
