@@ -16,9 +16,6 @@ class UpdateCompanyHandler(ICommandHandler[Tuple[UUID, dict], [Company, None]]):
 
     async def handle(self, command: Tuple[UUID, dict]) -> [Company, None]:
         company_id, updated_data = command
-        DebugWaring(updated_data)
-        DebugError(type(updated_data))
-
         return await self.company_repository.update_company(company_id, updated_data)
 
 
