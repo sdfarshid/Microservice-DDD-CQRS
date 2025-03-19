@@ -1,8 +1,9 @@
 from typing import List
+from uuid import UUID
 
+import httpx
 from fastapi import Depends
 
-from app.domain.company.services.company_service import CompanyService
 from app.domain.product.commands.create_product import CreateProductCommand
 from app.domain.product.commands.delete_product import DeleteProductCommand
 from app.domain.product.commands.update_product import UpdateProductCommand
@@ -17,16 +18,15 @@ class ProductService:
     def __init__(
             self,
             product_handler: ProductHandler = Depends(ProductHandler),
-            company_service: CompanyService = Depends(CompanyService),
     ):
         self.product_handler = product_handler
-        self.company_service = company_service
 
     async def create_product(self, command: CreateProductCommand) -> Product:
-        if not await self.company_service.get_company_by_id(command.company_id):
+
+        if not await self._check_company_exists(command.company_id):
             raise ValueError("Company not found")
-        product = command.to_domain_product()
-        return await self.product_handler.create(product)
+
+        return await self.product_handler.create(command.to_domain_product())
 
     async def get_product(self, query: GetProductByIdQuery) -> [Product, None]:
         return await self.product_handler.get(query)
@@ -44,3 +44,13 @@ class ProductService:
             raise ValueError("Product not found")
         updated_product = ProductMapper.update_from_command(product, command)
         return await self.product_handler.update((command.product_id, updated_product))
+
+    async def _check_company_exists(self, company_id: UUID) -> bool:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{self.company_service_url}/{company_id}")
+            if response.status_code == 404:
+                return False
+            elif response.status_code == 200:
+                return True
+            else:
+                raise ValueError("Error checking company existence")

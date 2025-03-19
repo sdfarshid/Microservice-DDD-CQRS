@@ -2,8 +2,9 @@ from typing import List
 
 from fastapi import Depends
 
-from app.domain.company.handlers.interfaces.Icommand_handler import ICommandHandler
-from app.domain.company.handlers.interfaces.Iquery_handler import IQueryHandler
+from app.config.config import settings
+from app.domain.product.handlers.interfaces.Icommand_handler import ICommandHandler
+from app.domain.product.handlers.interfaces.Iquery_handler import IQueryHandler
 from app.domain.product.commands.create_product import CreateProductCommand
 from app.domain.product.commands.delete_product import DeleteProductCommand
 from app.domain.product.models.product import Product
@@ -16,12 +17,12 @@ from app.infrastructure.repositories.product.product_repository import ProductRe
 class ProductHandler(ICommandHandler, IQueryHandler):
     def __init__(self, product_repository: ProductRepository = Depends(ProductRepository)):
         self.product_repository = product_repository
+        self.company_service_url = settings.COMPANY_SERVICE_URL
 
-    async def create(self, command: CreateProductCommand) -> Product:
-        product = command.to_product()
-        product_db = ProductMapper.to_orm(product)
+    async def create(self, command: Product) -> Product:
+        product_db = ProductMapper.to_orm(command)
         await self.product_repository.add_product(product_db)
-        return product
+        return command
 
     async def get(self, query: GetProductByIdQuery) -> [Product, None]:
         product_db = await self.product_repository.get_product_by_id(query.product_id)
