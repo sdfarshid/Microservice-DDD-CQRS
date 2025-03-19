@@ -1,8 +1,10 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import PostgresDsn
+from pydantic import PostgresDsn, HttpUrl
 
 
 class Settings(BaseSettings):
+
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -16,6 +18,7 @@ class Settings(BaseSettings):
     POSTGRES_HOST_PRODUCT: str
     POSTGRES_PORT_PRODUCT: str
     APP_PORT_PRODUCT: str
+    COMPANY_SERVICE_URL: HttpUrl
 
     @property
     def DATABASE_URL(self) -> PostgresDsn:
