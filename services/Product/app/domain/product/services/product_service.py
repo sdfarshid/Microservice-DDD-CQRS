@@ -12,7 +12,7 @@ from app.domain.product.handlers.product_handler import ProductHandler
 from app.domain.product.models.product import Product
 from app.domain.product.queries.get_product_by_id import GetProductByIdQuery
 from app.domain.product.queries.list_products import ListProductsQuery
-from app.infrastructure.mappers.product_mapper import ProductMapper
+from app.infrastructure.mappers.product_mapper import ProductMapper, ProductResponse
 from app.utilities.log import DebugWaring, DebugError
 
 
@@ -32,11 +32,12 @@ class ProductService:
 
         return await self.product_handler.create(command.to_domain_product())
 
+    async def list_products(self, query: ListProductsQuery) -> list[ProductResponse]:
+        listOfProductsDomainModel = await self.product_handler.list(query)
+        return [ProductMapper.to_response(product) for product in listOfProductsDomainModel]
+
     async def get_product(self, query: GetProductByIdQuery) -> [Product, None]:
         return await self.product_handler.get(query)
-
-    async def list_products(self, query: ListProductsQuery) -> List[Product]:
-        return await self.product_handler.list(query)
 
     async def delete_product(self, command: DeleteProductCommand) -> bool:
         return await self.product_handler.delete(command)

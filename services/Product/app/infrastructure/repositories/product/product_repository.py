@@ -4,12 +4,14 @@ from fastapi import Depends
 from sqlalchemy import select, update, delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.domain.mixins.pagination import PaginationParams
+
+from app.domain.product.mixins.pagination import PaginationParams
 from app.infrastructure.database.session import get_db
 from app.infrastructure.database.models.product import ProductDBModel
+from app.infrastructure.repositories.product.interface.Icompany_repository import IProductRepository
 
 
-class ProductRepository:
+class ProductRepository(IProductRepository):
     def __init__(self, db: AsyncSession = Depends(get_db)):
         self.db = db
 
@@ -40,10 +42,14 @@ class ProductRepository:
         )
         return result.scalars().one_or_none()
 
-    async def list_products(self, pagination: PaginationParams) -> Sequence[ProductDBModel]:
-        result = await self.db.execute(
-            select(ProductDBModel).offset(pagination.offset).limit(pagination.limit)
-        )
+    async def list_products(self, pagination: PaginationParams, company_id: [UUID, None]) -> Sequence[ProductDBModel]:
+        query = select(ProductDBModel)
+        if company_id:
+            query = query.where(ProductDBModel.company_id == company_id)
+
+        query = query.offset(pagination.offset).limit(pagination.limit)
+
+        result = await self.db.execute(query)
         return result.scalars().all()
 
     async def update_product(self, product_id: UUID, updated_data: dict) -> [ProductDBModel, None]:

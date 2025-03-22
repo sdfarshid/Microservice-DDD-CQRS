@@ -1,7 +1,7 @@
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, Request, Depends, HTTPException, Query
 
 from app.domain.product.commands.create_product import CreateProductCommand
 from app.domain.product.commands.update_product import UpdateProductCommand
@@ -10,7 +10,8 @@ from app.domain.product.models.product import Product
 from app.domain.product.queries.get_product_by_id import GetProductByIdQuery
 from app.domain.product.queries.list_products import ListProductsQuery
 from app.domain.product.services.product_service import ProductService
-from app.utilities.log import DebugError
+from app.infrastructure.mappers.product_mapper import ProductResponse
+from app.utilities.log import DebugError, DebugWaring
 
 router = APIRouter()
 
@@ -31,6 +32,13 @@ async def create_product(command: CreateProductCommand, service: ProductServiceD
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
+@router.get("/products", response_model=List[ProductResponse])
+async def list_products(service: ProductServiceDependency,
+                        pagination: PaginationParams = Depends(get_pagination_params),
+                        company_id: Optional[UUID] = Query(None, description="ID of the company to filter products")
+                        ):
+    query = ListProductsQuery(pagination=pagination, company_id=company_id)
+    return await service.list_products(query)
 
 
 @router.get("/{product_id}", response_model=Product)
@@ -40,13 +48,6 @@ async def get_product(product_id: UUID, service: ProductServiceDependency):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
-
-
-@router.get("/products", response_model=List[Product])
-async def list_products(service: ProductServiceDependency,
-                        pagination: PaginationParams = Depends(get_pagination_params)):
-    query = ListProductsQuery(pagination=pagination)
-    return await service.list_products(query)
 
 
 @router.put("/{product_id}", response_model=Product)
