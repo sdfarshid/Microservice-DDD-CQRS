@@ -37,7 +37,6 @@ async def list_companies(
         service: ProductServiceDependency,
         pagination: PaginationParams = Depends(get_pagination_params)
 ):
-    DebugWaring(pagination)
     query = ListCompaniesQuery(pagination=pagination)
     return await service.list_companies(query)
 
