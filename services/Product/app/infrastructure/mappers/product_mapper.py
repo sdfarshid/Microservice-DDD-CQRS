@@ -46,6 +46,7 @@ class ProductMapper:
             price=domain_model.price.value,
             company_id=domain_model.company_id,
             stock=domain_model.stock,
+            sku=domain_model.sku.value,
             status=domain_model.status,
             created_at=domain_model.created_at,
             updated_at=domain_model.updated_at
