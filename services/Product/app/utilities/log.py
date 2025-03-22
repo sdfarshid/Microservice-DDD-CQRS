@@ -23,7 +23,7 @@ if not logger.hasHandlers():
 logger.debug("Logger initialized!")
 
 
-def DebugWaring(message):
+def DebugWaring(message: object) -> object:
     logger.debug(f"⚠️⚠️ --  {message}")
 
 

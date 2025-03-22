@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Request, Depends, HTTPException, Query
 
 from app.domain.product.commands.create_product import CreateProductCommand
+from app.domain.product.commands.delete_product import DeleteProductCommand
 from app.domain.product.commands.update_product import UpdateProductCommand
 from app.domain.product.mixins.pagination import PaginationParams, get_pagination_params
 from app.domain.product.models.product import Product
@@ -37,31 +38,64 @@ async def list_products(service: ProductServiceDependency,
                         pagination: PaginationParams = Depends(get_pagination_params),
                         company_id: Optional[UUID] = Query(None, description="ID of the company to filter products")
                         ):
-    query = ListProductsQuery(pagination=pagination, company_id=company_id)
-    return await service.list_products(query)
+    try:
+        query = ListProductsQuery(pagination=pagination, company_id=company_id)
+        return await service.list_products(query)
+    except ValueError as value_error:
+        raise HTTPException(status_code=404, detail=str(value_error))
+    except HTTPException as http_error:
+        raise http_error
+    except Exception as error:
+        DebugError(f"Error update product : {error}")
+        raise HTTPException(status_code=505, detail=str(error))
 
 
-@router.get("/{product_id}", response_model=Product)
+@router.get("/{product_id}", response_model=ProductResponse)
 async def get_product(product_id: UUID, service: ProductServiceDependency):
-    query = GetProductByIdQuery(product_id=product_id)
-    product = await service.get_product(query)
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return product
+    try:
+        query = GetProductByIdQuery(product_id=product_id)
+        product = await service.get_product(query)
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return product
+    except ValueError as value_error:
+        raise HTTPException(status_code=404, detail=str(value_error))
+    except HTTPException as http_error:
+        raise http_error
+    except Exception as error:
+        DebugError(f"Error update product : {error}")
+        raise HTTPException(status_code=505, detail=str(error))
 
 
-@router.put("/{product_id}", response_model=Product)
+@router.put("/{product_id}", response_model=ProductResponse)
 async def update_product(product_id: UUID, command: UpdateProductCommand, service: ProductServiceDependency):
-    command.product_id = product_id
-    updated_product = await service.update_product(command)
-    if not updated_product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return updated_product
+    try:
+        command.product_id = product_id
+        updated_product = await service.update_product(command)
+        if not updated_product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return updated_product
+    except ValueError as value_error:
+        raise HTTPException(status_code=404, detail=str(value_error))
+    except HTTPException as http_error:
+        raise http_error
+    except Exception as error:
+        DebugError(f"Error update product : {error}")
+        raise HTTPException(status_code=505, detail=str(error))
 
 
 @router.delete("/{product_id}")
 async def delete_product(product_id: UUID, service: ProductServiceDependency):
-    success = await service.delete_product(command)
-    if not success:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return {"message": "Product deleted successfully"}
+    try:
+        command = DeleteProductCommand(product_id=product_id)
+        success = await service.delete_product(command)
+        if not success:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return {"message": "Product deleted successfully"}
+    except ValueError as value_error:
+        raise HTTPException(status_code=404, detail=str(value_error))
+    except HTTPException as http_error:
+        raise http_error
+    except Exception as error:
+        DebugError(f"Error update product : {error}")
+        raise HTTPException(status_code=505, detail=str(error))

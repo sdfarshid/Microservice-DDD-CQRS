@@ -65,21 +65,7 @@ class ProductMapper:
             company_id=domain_model.company_id,
             sku=domain_model.sku.value,
             price=domain_model.price.value,
+            description=domain_model.description,
             stock=domain_model.stock,
             status=domain_model.status,
-        )
-
-
-    @staticmethod
-    def update_from_command(product: Product, command: UpdateProductCommand) -> Product:
-        return Product(
-            id=product.id,
-            name=ProductName(value=command.name) if command.name is not None else product.name,
-            description=command.description if command.description is not None else product.description,
-            price=Price(value=command.price) if command.price is not None else product.price,
-            company_id=product.company_id,
-            stock=command.stock if command.stock is not None else product.stock,
-            status=command.status if command.status is not None else product.status,
-            created_at=product.created_at,
-            updated_at=datetime.now()
         )

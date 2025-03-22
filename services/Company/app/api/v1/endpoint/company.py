@@ -41,8 +41,6 @@ async def list_companies(
     return await service.list_companies(query)
 
 
-
-
 @router.get("/{company_id}", response_model=CompanyResponse)
 async def get_company(company_id: UUID, service: ProductServiceDependency):
     try:
@@ -51,8 +49,6 @@ async def get_company(company_id: UUID, service: ProductServiceDependency):
         raise HTTPException(status_code=404, detail="Company not found")
     except Exception as error:
         raise HTTPException(status_code=500, detail="Internal Server Error")
-
-
 
 
 @router.patch("/{company_id}", response_model=CompanyResponse)
@@ -65,15 +61,9 @@ async def update_company(updateData: UpdateCompanyCommand, service: ProductServi
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
-
-
-
 @router.delete("/{company_id}")
 async def delete_company(company_id: UUID, service: ProductServiceDependency):
     success = await service.delete_company(company_id)
     if not success:
         raise HTTPException(status_code=404, detail="Company not found")
     return {"message": "Company deleted successfully"}
-
-
-

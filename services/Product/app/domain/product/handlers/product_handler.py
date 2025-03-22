@@ -1,4 +1,5 @@
-from typing import List
+from typing import List, Tuple
+from uuid import UUID
 
 from fastapi import Depends
 
@@ -41,5 +42,8 @@ class ProductHandler(ICommandHandler, IQueryHandler):
     async def delete(self, command: DeleteProductCommand) -> bool:
         return await self.product_repository.delete_product(command.product_id)
 
-    async def update(self, param):
-        pass
+    async def update(self, command: Tuple[UUID, dict]) -> [Product, None]:
+        product_id, updated_data = command
+        product_db = await self.product_repository.update_product(product_id, updated_data)
+        return ProductMapper.to_domain(product_db)
+
