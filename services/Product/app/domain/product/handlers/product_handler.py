@@ -20,9 +20,12 @@ class ProductHandler(ICommandHandler, IQueryHandler):
         self.company_service_url = settings.COMPANY_SERVICE_URL
 
     async def create(self, command: Product) -> Product:
-        product_db = ProductMapper.to_orm(command)
-        await self.product_repository.add_product(product_db)
-        return command
+        try:
+            product_db = ProductMapper.to_orm(command)
+            await self.product_repository.add_product(product_db)
+            return command
+        except Exception as e:
+            raise e
 
     async def get(self, query: GetProductByIdQuery) -> [Product, None]:
         product_db = await self.product_repository.get_product_by_id(query.product_id)

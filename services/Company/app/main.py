@@ -11,6 +11,7 @@ app = FastAPI(title="Company Service",
               on_shutdown=[lambda: logger.info("Shutting down Company Service")]
               )
 
+
 app.include_router(api_router, prefix="/api/v1")
 
 @app.on_event("startup")

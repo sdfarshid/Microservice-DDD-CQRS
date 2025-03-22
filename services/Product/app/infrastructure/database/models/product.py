@@ -10,6 +10,7 @@ class ProductDBModel(Base):
     name = Column(String(255), nullable=False)
     description = Column(String, nullable=True)
     price = Column(Float, nullable=False)
+    sku = Column(String(100), nullable=False, unique=True)
     company_id = Column(PG_UUID(as_uuid=True), nullable=False, index=True)
     stock = Column(Integer, nullable=False)
     status = Column(Enum('active', 'inactive', name='product_status'), nullable=False)

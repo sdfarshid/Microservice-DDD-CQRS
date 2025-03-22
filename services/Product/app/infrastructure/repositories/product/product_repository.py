@@ -2,6 +2,7 @@ from typing import List, Sequence
 from uuid import UUID
 from fastapi import Depends
 from sqlalchemy import select, update, delete
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.mixins.pagination import PaginationParams
 from app.infrastructure.database.session import get_db
@@ -18,9 +19,20 @@ class ProductRepository:
             await self.db.commit()
             await self.db.refresh(product)
             return product
+        except IntegrityError as e:
+            if "products_sku_key" in str(e):
+                raise ValueError("SKU already exists. Please choose a different SKU.")
+            await self.db.rollback()
+            raise e
         except Exception as e:
             await self.db.rollback()
             raise e
+
+    async def get_product_by_name(self, product_id: UUID) -> [ProductDBModel, None]:
+        result = await self.db.execute(
+            select(ProductDBModel).where(ProductDBModel.id == product_id)
+        )
+        return result.scalars().one_or_none()
 
     async def get_product_by_id(self, product_id: UUID) -> [ProductDBModel, None]:
         result = await self.db.execute(

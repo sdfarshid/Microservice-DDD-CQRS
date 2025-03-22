@@ -10,15 +10,27 @@ from app.domain.product.models.product import Product
 from app.domain.product.queries.get_product_by_id import GetProductByIdQuery
 from app.domain.product.queries.list_products import ListProductsQuery
 from app.domain.product.services.product_service import ProductService
+from app.utilities.log import DebugError
 
 router = APIRouter()
 
 ProductServiceDependency = Annotated[ProductService, Depends(ProductService)]
 
 
-@router.post("/products", response_model=Product)
+@router.post("/products")
 async def create_product(command: CreateProductCommand, service: ProductServiceDependency):
-    return await service.create_product(command)
+    try:
+        result = await service.create_product(command)
+        return {"message": "Product created successfully", "id": result.id}
+    except ValueError as value_error:
+        raise HTTPException(status_code=409, detail=str(value_error))
+    except HTTPException as http_error:
+        raise http_error
+    except Exception as error:
+        DebugError(f"Error create product : {error}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
 
 
 @router.get("/{product_id}", response_model=Product)
