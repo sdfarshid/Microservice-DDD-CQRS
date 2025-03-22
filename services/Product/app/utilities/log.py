@@ -24,8 +24,8 @@ logger.debug("Logger initialized!")
 
 
 def DebugWaring(message):
-    logger.debug(f"⚠️⚠️{message}")
+    logger.debug(f"⚠️⚠️ --  {message}")
 
 
 def DebugError(message):
-    logger.debug(f"🚨️{message}")
+    logger.debug(f"🚨️ --  {message}")
