@@ -2,5 +2,5 @@ from pydantic import BaseModel
 from uuid import UUID
 
 
-class DeleteProductCommand(BaseModel):
+class DeleteCatalogCommand(BaseModel):
     catalog_id: UUID
