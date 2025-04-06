@@ -17,7 +17,6 @@ from app.utilities.log import DebugError
 router = APIRouter()
 
 CatalogServiceDependency = Annotated[CatalogService, Depends(CatalogService)]
-AssignCatalogServiceDependency = Annotated[AssignCatalogService, Depends(AssignCatalogService)]
 
 
 def handle_exceptions(func):
@@ -80,11 +79,3 @@ async def delete_catalog(catalog_id: UUID, service: CatalogServiceDependency):
         raise HTTPException(status_code=404, detail="Catalog not found")
     return {"message": "Catalog deleted successfully"}
 
-
-@router.post("/{catalog_id}/products/{product_id}")
-@handle_exceptions
-async def add_product_to_catalog(catalog_id: UUID, product_id: UUID, service: AssignCatalogServiceDependency):
-    success = await service.add_product_to_catalog(catalog_id, product_id)
-    if not success:
-        raise HTTPException(status_code=400, detail="Failed to add product to catalog")
-    return {"message": "Product added to catalog successfully"}

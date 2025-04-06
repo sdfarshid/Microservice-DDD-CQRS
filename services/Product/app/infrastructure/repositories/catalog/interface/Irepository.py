@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Sequence
+from typing import Sequence, List
 from uuid import UUID
 
 from app.domain.catalog.models.catalog import Catalog
@@ -33,7 +33,7 @@ class IRepository(ABC):
     @abstractmethod
     async def delete_catalog(self, catalog_id: UUID) -> bool:
         pass
-
+    
     @abstractmethod
-    async def add_product_to_catalog(self, catalog_id: UUID, product_id: UUID) -> bool:
+    async def get_catalogs_by_ids(self, catalog_ids: List[UUID]) -> List[Catalog]:
         pass

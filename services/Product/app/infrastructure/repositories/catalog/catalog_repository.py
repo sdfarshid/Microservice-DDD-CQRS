@@ -77,15 +77,9 @@ class CatalogRepository(IRepository):
             await self.db.rollback()
             raise e
 
-    async def add_product_to_catalog(self, catalog_id: UUID, product_id: UUID) -> bool:
-        try:
-            catalog_product = CatalogProductDBModel(
-                catalog_id=catalog_id,
-                product_id=product_id
-            )
-            self.db.add(catalog_product)
-            await self.db.commit()
-            return True
-        except Exception as e:
-            await self.db.rollback()
-            raise e
+    async def get_catalogs_by_ids(self, catalog_ids: List[UUID]) -> List[Catalog]:
+        result = await self.db.execute(
+            select(CatalogDBModel).where(CatalogDBModel.id.in_(catalog_ids))
+        )
+        catalogs_db = result.scalars().all()
+        return [CatalogMapper.to_domain(catalog_db) for catalog_db in catalogs_db]
