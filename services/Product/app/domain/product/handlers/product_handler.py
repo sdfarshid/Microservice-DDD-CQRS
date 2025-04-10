@@ -4,10 +4,9 @@ from uuid import UUID
 from fastapi import Depends
 
 from app.config.config import settings
-from app.domain.product.handlers.interfaces.Icommand_handler import ICommandHandler
-from app.domain.product.handlers.interfaces.Iquery_handler import IQueryHandler
 from app.domain.product.commands.create_product import CreateProductCommand
 from app.domain.product.commands.delete_product import DeleteProductCommand
+from app.domain.product.handlers.interfaces.Iproduct_handler import IProductHandler
 from app.domain.product.models.product import Product
 from app.domain.product.queries.get_product_by_id import GetProductByIdQuery
 from app.domain.product.queries.list_products import ListProductsQuery
@@ -16,7 +15,7 @@ from app.infrastructure.repositories.product.interface.Icompany_repository impor
 from app.infrastructure.repositories.product.product_repository import ProductRepository
 
 
-class ProductHandler(ICommandHandler, IQueryHandler):
+class ProductHandler(IProductHandler):
     def __init__(self, product_repository: IProductRepository = Depends(ProductRepository)):
         self.product_repository = product_repository
         self.company_service_url = settings.COMPANY_SERVICE_URL

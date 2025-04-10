@@ -8,8 +8,8 @@ from app.config.config import settings
 from app.domain.product.commands.create_product import CreateProductCommand
 from app.domain.product.commands.delete_product import DeleteProductCommand
 from app.domain.product.commands.update_product import UpdateProductCommand
+from app.domain.product.handlers.interfaces.Iproduct_handler import IProductHandler
 from app.domain.product.handlers.product_handler import ProductHandler
-from app.domain.product.models.product import Product
 from app.domain.product.queries.get_product_by_id import GetProductByIdQuery
 from app.domain.product.queries.list_products import ListProductsQuery
 from app.infrastructure.mappers.product_mapper import ProductMapper, ProductResponse
@@ -19,7 +19,7 @@ from app.utilities.log import DebugWaring, DebugError
 class ProductService:
     def __init__(
             self,
-            product_handler: ProductHandler = Depends(ProductHandler),
+            product_handler: IProductHandler = Depends(ProductHandler),
     ):
         self.company_service_url = settings.COMPANY_SERVICE_URL
         self.product_handler = product_handler
