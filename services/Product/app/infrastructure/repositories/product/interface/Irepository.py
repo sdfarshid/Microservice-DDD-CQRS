@@ -21,6 +21,10 @@ class IProductRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_products_by_ids(self, product_id: list[UUID]) -> [ProductDBModel, None]:
+        pass
+
+    @abstractmethod
     async def update_product(self, product_id: UUID, updated_data: dict) -> [ProductDBModel, None]:
         pass
 
