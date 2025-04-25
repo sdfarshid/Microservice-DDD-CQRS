@@ -5,8 +5,6 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from app.domain.product.commands.create_product import CreateProductCommand
-from app.domain.product.commands.update_product import UpdateProductCommand
 from app.domain.product.models.product import Product
 from app.domain.product.models.value_objects.price import Price
 from app.domain.product.models.value_objects.product_name import ProductName
