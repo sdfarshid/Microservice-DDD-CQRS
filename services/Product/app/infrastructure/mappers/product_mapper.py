@@ -22,6 +22,7 @@ class ProductResponse(BaseModel):
     price: float
     description: str | None = None
     stock: int
+    reserved_stock: int = 0
     status: str
 
 
@@ -37,6 +38,7 @@ class ProductMapper:
             company_id=orm_model.company_id,
             sku=SKU(value=orm_model.sku),
             stock=orm_model.stock,
+            reserved_stock=orm_model.reserved_stock,
             status=orm_model.status,
             created_at=orm_model.created_at,
             updated_at=orm_model.updated_at
@@ -53,6 +55,7 @@ class ProductMapper:
             stock=domain_model.stock,
             sku=domain_model.sku.value,
             status=domain_model.status,
+            reserved_stock=domain_model.reserved_stock,
             created_at=domain_model.created_at,
             updated_at=domain_model.updated_at
         )
@@ -65,6 +68,7 @@ class ProductMapper:
             company_id=domain_model.company_id,
             sku=domain_model.sku.value,
             price=domain_model.price.value,
+            reserved_stock=domain_model.reserved_stock,
             description=domain_model.description,
             stock=domain_model.stock,
             status=domain_model.status,
