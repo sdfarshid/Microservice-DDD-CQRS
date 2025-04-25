@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, List
+from typing import Generic, TypeVar, List, Optional
 
 TQuery = TypeVar('TQuery')
 TResult = TypeVar('TResult')
@@ -7,7 +7,7 @@ TResult = TypeVar('TResult')
 
 class IQueryHandler(ABC):
     @abstractmethod
-    async def get(self, query: TQuery) -> [TResult, None]:
+    async def get(self, query: TQuery) -> Optional[TResult]:
         pass
 
     @abstractmethod
