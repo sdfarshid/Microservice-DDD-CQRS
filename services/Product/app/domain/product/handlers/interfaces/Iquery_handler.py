@@ -13,3 +13,7 @@ class IQueryHandler(ABC):
     @abstractmethod
     async def list(self, query: TQuery) -> List[TResult]:
         pass
+
+    @abstractmethod
+    async def get_batch_product_by_ids(self, query: TQuery) -> List[TResult]:
+        pass
