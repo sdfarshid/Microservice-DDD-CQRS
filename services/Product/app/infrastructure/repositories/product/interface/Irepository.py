@@ -25,7 +25,7 @@ class IProductRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_product(self, product_id: UUID, updated_data: dict) ->Sequence[ProductDBModel]:
+    async def update_product(self, product_id: UUID, updated_data: dict) ->Optional[ProductDBModel]:
         pass
 
     @abstractmethod
