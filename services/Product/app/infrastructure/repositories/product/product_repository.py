@@ -77,7 +77,7 @@ class ProductRepository(IProductRepository):
             await self.db.rollback()
             raise e
 
-    async def get_products_by_ids(self, product_ids: List[UUID]) -> [ProductDBModel, Exception]:
+    async def get_products_by_ids(self, product_ids: List[UUID]) -> list[ProductDBModel]:
         try:
             result = await self.db.execute(
                 select(ProductDBModel).where(ProductDBModel.id.in_(product_ids))
