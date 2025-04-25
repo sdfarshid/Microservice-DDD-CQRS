@@ -1,8 +1,25 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from app.api.v1.routers import api_router
 from app.infrastructure.database.session import init_db
 from app.utilities.log import logger
+
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Starting Product Service")
+    print("Starting database initialization...")
+    await init_db()
+    print("Database initialized!")
+
+    yield
+
+    logger.info("Shutting down Product Service")
+
+
 
 app = FastAPI(title="Product Service",
               version="1.0",
@@ -12,13 +29,6 @@ app = FastAPI(title="Product Service",
               )
 
 app.include_router(api_router, prefix="/api/v1")
-
-
-@app.on_event("startup")
-async def on_startup():
-    print("Starting database initialization...")
-    await init_db()
-    print("Database initialized!")
 
 
 @app.get("/")
