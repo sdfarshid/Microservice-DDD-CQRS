@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Sequence
+from typing import Sequence, Optional
 from uuid import UUID
 
 from app.domain.product.mixins.pagination import PaginationParams
@@ -17,7 +17,7 @@ class IProductRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_product_by_id(self, product_id: UUID) -> [ProductDBModel, None]:
+    async def get_product_by_id(self, product_id: UUID) ->  Optional[ProductDBModel]:
         pass
 
     @abstractmethod
@@ -25,12 +25,12 @@ class IProductRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_product(self, product_id: UUID, updated_data: dict) -> [ProductDBModel, None]:
+    async def update_product(self, product_id: UUID, updated_data: dict) ->Sequence[ProductDBModel]:
         pass
 
     @abstractmethod
     async def delete_product(self, product_id: UUID) -> bool:
         pass
     @abstractmethod
-    async def get_product_by_name(self, product_id: UUID) -> [ProductDBModel, None]:
+    async def get_product_by_name(self, product_id: UUID) ->  Optional[ProductDBModel]:
         pass

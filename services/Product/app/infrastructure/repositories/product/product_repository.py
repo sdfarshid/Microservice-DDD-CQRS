@@ -1,4 +1,4 @@
-from typing import List, Sequence
+from typing import List, Sequence, Optional
 from uuid import UUID
 from fastapi import Depends
 from sqlalchemy import select, update, delete
@@ -30,13 +30,13 @@ class ProductRepository(IProductRepository):
             await self.db.rollback()
             raise e
 
-    async def get_product_by_name(self, product_id: UUID) -> [ProductDBModel, None]:
+    async def get_product_by_name(self, product_id: UUID) ->  Optional[ProductDBModel]:
         result = await self.db.execute(
             select(ProductDBModel).where(ProductDBModel.id == product_id)
         )
         return result.scalars().one_or_none()
 
-    async def get_product_by_id(self, product_id: UUID) -> [ProductDBModel, None]:
+    async def get_product_by_id(self, product_id: UUID) -> Optional[ProductDBModel]:
         result = await self.db.execute(
             select(ProductDBModel).where(ProductDBModel.id == product_id)
         )
@@ -52,7 +52,7 @@ class ProductRepository(IProductRepository):
         result = await self.db.execute(query)
         return result.scalars().all()
 
-    async def update_product(self, product_id: UUID, updated_data: dict) -> [ProductDBModel, None]:
+    async def update_product(self, product_id: UUID, updated_data: dict) -> Optional[ProductDBModel]:
         try:
             result = await self.db.execute(
                 update(ProductDBModel)
