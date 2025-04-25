@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.product.mixins.pagination import PaginationParams
 from app.infrastructure.database.session import get_db
 from app.infrastructure.database.models.product import ProductDBModel
-from app.infrastructure.repositories.product.interface.Icompany_repository import IProductRepository
+from app.infrastructure.repositories.product.interface.Irepository import IProductRepository
 
 
 class ProductRepository(IProductRepository):
@@ -75,4 +75,13 @@ class ProductRepository(IProductRepository):
             return result.rowcount > 0
         except Exception as e:
             await self.db.rollback()
+            raise e
+
+    async def get_products_by_ids(self, product_ids: List[UUID]) -> [ProductDBModel, Exception]:
+        try:
+            result = await self.db.execute(
+                select(ProductDBModel).where(ProductDBModel.id.in_(product_ids))
+            )
+            return result.scalars().all()
+        except Exception as e:
             raise e
