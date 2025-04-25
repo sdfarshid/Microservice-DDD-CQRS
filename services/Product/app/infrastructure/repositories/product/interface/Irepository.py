@@ -21,7 +21,7 @@ class IProductRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_products_by_ids(self, product_id: list[UUID]) -> [ProductDBModel, None]:
+    async def get_products_by_ids(self, product_id: list[UUID]) -> [ProductDBModel, Exception]:
         pass
 
     @abstractmethod
