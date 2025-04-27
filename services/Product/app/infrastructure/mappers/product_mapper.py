@@ -5,10 +5,10 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from app.domain.product.models.product import Product
-from app.domain.product.models.value_objects.price import Price
-from app.domain.product.models.value_objects.product_name import ProductName
-from app.domain.product.models.value_objects.sku import SKU
+from app.domain.product.aggregates.product import Product
+from app.domain.product.value_objects.price import Price
+from app.domain.product.value_objects.product_name import ProductName
+from app.domain.product.value_objects.sku import SKU
 from app.infrastructure.database.models.product import ProductDBModel
 
 
@@ -71,3 +71,19 @@ class ProductMapper:
             stock=domain_model.stock,
             status=domain_model.status,
         )
+
+    @staticmethod
+    def to_db_dict(product: Product) -> dict:
+        return {
+            "id": product.id,
+            "name": product.name.value,
+            "description": product.description,
+            "price": product.price.value,
+            "company_id": product.company_id,
+            "stock": product.stock,
+            "sku": product.sku.value,
+            "status": product.status,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "reserved_stock": product.reserved_stock
+        }

@@ -4,10 +4,10 @@ from pydantic import BaseModel
 from uuid import UUID
 from typing import Optional
 
-from app.domain.product.models.product import Product
-from app.domain.product.models.value_objects.price import Price
-from app.domain.product.models.value_objects.product_name import ProductName
-from app.domain.product.models.value_objects.sku import SKU
+from app.domain.product.aggregates.product import Product
+from app.domain.product.value_objects.price import Price
+from app.domain.product.value_objects.product_name import ProductName
+from app.domain.product.value_objects.sku import SKU
 
 
 class UpdateProductCommand(BaseModel):
