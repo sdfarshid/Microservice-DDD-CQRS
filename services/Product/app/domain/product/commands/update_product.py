@@ -36,18 +36,3 @@ class UpdateProductCommand(BaseModel):
             created_at=product.created_at,
             updated_at=datetime.now()
         )
-
-    @staticmethod
-    def to_update_dict(product: Product) -> dict:
-        return {
-            "id": product.id,
-            "name": product.name.value,
-            "description": product.description,
-            "price": product.price.value,
-            "company_id": product.company_id,
-            "stock": product.stock,
-            "sku": product.sku.value,
-            "status": product.status,
-            "created_at": product.created_at,
-            "updated_at": product.updated_at
-        }
