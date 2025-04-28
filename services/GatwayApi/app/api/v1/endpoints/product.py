@@ -2,7 +2,7 @@ from typing import Annotated, List, Optional
 from uuid import UUID
 from fastapi import APIRouter, Request, Depends, HTTPException, Query
 
-from GatwayApi.app.services.product.actions import ReserveProductCommand
+from app.services.product.actions import ReserveProductCommand
 from app.config.config import settings
 from app.utilities.log import DebugError, DebugWaring
 
