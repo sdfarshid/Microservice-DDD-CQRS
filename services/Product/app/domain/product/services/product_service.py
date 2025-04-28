@@ -119,7 +119,7 @@ class ProductService:
                 product_data = ProductMapper.to_db_dict(product)
                 await self.product_handler.update((product_id, product_data))
                 reserved_any =True
-                results.append({"product_id": str(product_id), "success": False, "reason": "Out of stock"})
+                results.append({"product_id": str(product_id), "success": True})
             except ValueError as e:
                 DebugError(f"ValueError: {e}")
 
