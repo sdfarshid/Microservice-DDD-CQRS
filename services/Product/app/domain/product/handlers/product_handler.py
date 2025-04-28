@@ -6,7 +6,7 @@ from fastapi import Depends
 from app.config.config import settings
 from app.domain.product.commands.delete_product import DeleteProductCommand
 from app.domain.product.handlers.interfaces.Iproduct_handler import IProductHandler
-from app.domain.product.models.product import Product
+from app.domain.product.aggregates.product import Product
 from app.domain.product.queries.get_product_by_id import GetProductByIdQuery
 from app.domain.product.queries.get_product_by_ids import GetProductByIdsQuery
 from app.domain.product.queries.list_products import ListProductsQuery

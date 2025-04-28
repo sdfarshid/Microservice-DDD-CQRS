@@ -2,10 +2,10 @@ from __future__ import annotations
 from uuid import UUID
 from pydantic import BaseModel, Field
 
-from app.domain.product.models.product import Product
-from app.domain.product.models.value_objects.price import Price
-from app.domain.product.models.value_objects.product_name import ProductName
-from app.domain.product.models.value_objects.sku import SKU
+from app.domain.product.aggregates.product import Product
+from app.domain.product.value_objects.price import Price
+from app.domain.product.value_objects.product_name import ProductName
+from app.domain.product.value_objects.sku import SKU
 
 
 class CreateProductCommand(BaseModel):
