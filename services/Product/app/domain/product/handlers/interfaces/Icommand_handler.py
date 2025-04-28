@@ -17,3 +17,4 @@ class ICommandHandler(ABC):
     @abstractmethod
     async def delete(self, command: TCommand) -> bool:
         pass
+

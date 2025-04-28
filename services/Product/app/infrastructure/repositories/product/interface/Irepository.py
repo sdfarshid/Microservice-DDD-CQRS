@@ -13,7 +13,7 @@ class IProductRepository(ABC):
         pass
 
     @abstractmethod
-    async def list_products(self, pagination: PaginationParams, company_id: [UUID, None]) -> Sequence[ProductDBModel]:
+    async def list_products(self, pagination: PaginationParams, company_id: Optional[UUID]) -> Sequence[ProductDBModel]:
         pass
 
     @abstractmethod
