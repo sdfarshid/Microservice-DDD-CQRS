@@ -1,0 +1,41 @@
+version: "3.9"
+services:
+  order_db:
+    image: postgres
+    container_name: order_service_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_ORDER}
+    ports:
+      - "${POSTGRES_PORT_ORDER}:5432"
+    volumes:
+      - order_postgres_data:/var/lib/postgresql/data
+  order_app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: order_service_app
+    depends_on:
+      - order_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_ORDER}
+      POSTGRES_HOST: ${POSTGRES_HOST_ORDER}
+      POSTGRES_PORT: ${POSTGRES_PORT_ORDER}
+      APP_PORT: ${APP_PORT_ORDER}
+    ports:
+      - "${APP_PORT_ORDER}:8000"
+    volumes:
+      - .:/app
+      - ./app/logs:/app/logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  order_postgres_data:
