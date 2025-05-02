@@ -9,6 +9,7 @@ from app.domain.order.aggregates.order import Order
 from app.domain.order.entities.order_item import OrderItem
 from app.domain.order.enums.invoice_status import InvoiceStatus
 from app.domain.order.enums.order_status import OrderStatus
+from app.domain.order.value_objects.price import Price
 
 
 class OrderItemCommand(BaseModel):
@@ -27,7 +28,7 @@ class CreateOrderCommand(BaseModel):
     #shipping_address: str
     #discount_code: str | None = None
 
-    def to_order_domain(self, invoice_id: UUID, items: List[OrderItem], status: Optional[OrderStatus] = None) -> Order:
+    def to_order_domain(self, invoice_id: UUID, items: List[OrderItem]) -> Order:
         return Order(
             id=uuid4(),
             user_id=self.user_id,
@@ -35,12 +36,4 @@ class CreateOrderCommand(BaseModel):
             items=items
         )
 
-    def to_invoice_domain(self, total_amount: float, order: Order) -> Invoice:
-        return Invoice(
-            id=order.invoice_id,
-            order_id=order.id,
-            user_id=self.user_id,
-            items_total=total_amount,
-            status=InvoiceStatus.PENDING
-        )
 

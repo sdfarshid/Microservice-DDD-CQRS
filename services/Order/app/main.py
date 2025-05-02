@@ -16,6 +16,7 @@ app.include_router(api_router, prefix="/api/v1")
 
 @app.on_event("startup")
 async def on_startup():
+
     print("Starting database initialization...")
     await init_db()
     print("Database initialized!")

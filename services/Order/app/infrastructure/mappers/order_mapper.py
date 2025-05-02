@@ -6,6 +6,7 @@ from app.domain.order.entities.invoice import Invoice
 from app.domain.order.aggregates.order import Order
 from app.domain.order.entities.order_item import OrderItem
 from app.domain.order.enums.invoice_status import InvoiceStatus
+from app.domain.order.value_objects.price import Price
 from app.infrastructure.database.models.invoice import InvoiceDBModel
 from app.infrastructure.database.models.order import OrderDBModel
 from app.infrastructure.database.models.order_item import OrderItemDBModel
@@ -41,10 +42,9 @@ class OrderMapper:
             order_id=invoice_db.order_id,
             user_id=invoice_db.user_id,
             items_total=invoice_db.items_total,
-           # discount_amount=invoice_db.discount_amount,
-          #  tax=invoice_db.tax,
+           # discount_amount=invoice_db.discount_amount,   #  tax=invoice_db.tax,
           #  shipping_cost=invoice_db.shipping_cost,
-            total_amount=invoice_db.total_amount,
+            total_amount=Price(value=invoice_db.total_amount),
             status=InvoiceStatus(invoice_db.status)
         )
 
@@ -55,10 +55,19 @@ class OrderMapper:
             order_id=invoice.order_id,
             user_id=invoice.user_id,
             items_total=invoice.items_total,
-            total_amount=invoice.total_amount,
+            total_amount=invoice.total_amount.value,
             status=invoice.status.value,
-            created_at=invoice.created_at,
-            updated_at=invoice.updated_at
+        )
+
+    @staticmethod
+    def make_invoice_domain(order: Order) -> Invoice:
+        return Invoice(
+            id=order.invoice_id,
+            order_id=order.id,
+            user_id=order.user_id,
+            items_total=order.get_total_item(),
+            total_amount=Price(value=order.get_total_amount()),
+            status=InvoiceStatus.PENDING
         )
 
 

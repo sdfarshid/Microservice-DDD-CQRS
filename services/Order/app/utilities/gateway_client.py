@@ -23,7 +23,7 @@ class GatewayClient:
         }
         return await self.call_api(
             method="POST",
-            endpoint="reserve",
+            endpoint="product/reserve",
             json_data=json_data
         )
 

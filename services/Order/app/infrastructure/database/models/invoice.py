@@ -11,7 +11,7 @@ class InvoiceDBModel(Base, AuditMixin):
     id = Column(PG_UUID(as_uuid=True), primary_key=True)
     order_id = Column(PG_UUID(as_uuid=True), nullable=False, index=True)
     user_id = Column(PG_UUID(as_uuid=True), nullable=False, index=True)
-    items_total = Column(Float, nullable=False)
+    items_total = Column(Integer, nullable=False)
     total_amount = Column(Float, nullable=False)
     status = Column(Enum(InvoiceStatus, name='invoice_status'), nullable=False, default=InvoiceStatus.PENDING.value)
 

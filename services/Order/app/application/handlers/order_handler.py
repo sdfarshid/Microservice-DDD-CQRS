@@ -28,7 +28,7 @@ class OrderHandler:
     async def create(self, command: CreateOrderCommand) -> Invoice:
 
         #Calculate total amount with HTTP request to gateway and product
-        items, total_amount = await self._calcTotalAmount(command.items)
+        items = await self._create_order_item_with_fetching_price(command.items)
 
         #Store order
         order = await self._store_orders(command, items)
@@ -37,10 +37,11 @@ class OrderHandler:
         await self._store_order_items(order.id, items)
 
         #Store invoice
-        invoice = await self._store_invoice(command, total_amount)
+        invoice = await self._store_invoice(order)
 
         # 1 - Reserve items just have 1 quantity
         reserved_items = await self.__reserved_products(order.id, items)
+        DebugWarning(reserved_items)
         if not reserved_items:
             await self.__cansel_order(order.id)
             raise ValueError("No items available to proceed with order")
@@ -53,7 +54,7 @@ class OrderHandler:
             #TODO:: Should change to Batch
             await self.__cansel_order(invoice.id)
 
-    async def _calcTotalAmount(self, items: List[OrderItemCommand]) -> tuple[List[OrderItem], float]:
+    async def _create_order_item_with_fetching_price(self, items: List[OrderItemCommand]) -> List[OrderItem]:
         total_amount = 0
         order_items = []
         #TODO:: should Using Batch API
@@ -65,9 +66,7 @@ class OrderHandler:
             product = await self._get_product(item.product_id)
             if product["stock"] < item.quantity:
                 raise ValueError(f"Product {product['name']} is out of stock")
-
             price = product["price"]
-            total_amount += price * item.quantity
             order_items.append(
                 OrderItem(
                     product_id=item.product_id,
@@ -76,7 +75,7 @@ class OrderHandler:
                     status=ItemStatus.PENDING
                 )
             )
-        return order_items, total_amount
+        return order_items
 
     async def _get_product(self, product_id: UUID) -> dict:
         try:
@@ -93,16 +92,14 @@ class OrderHandler:
             DebugError(f"Unexpected error occurred: {error}")
             raise ValueError(f"Unexpected error occurred: {error}")
 
-    async def _store_invoice(self, command, total_amount) -> Invoice:
-        invoice = OrderMapper.to_invoice_domain(command)
-        invoice_db = OrderMapper.to_invoice_orm(invoice)
-        await self.repository.add_invoice(invoice_db)
-        return invoice
+    async def _store_invoice(self, order: Order) -> Invoice:
+        invoice = OrderMapper.make_invoice_domain(order)
+        saved_invoice = await self.repository.add_invoice(invoice)
+        return saved_invoice
 
     async def _store_orders(self, command: CreateOrderCommand, items: List[OrderItem]) -> Order:
         orderAggregate = command.to_order_domain(invoice_id=uuid4(), items=items)
-        order_db = OrderMapper.to_order_orm(orderAggregate)
-        await self.repository.add_order(order_db)
+        await self.repository.add_order(orderAggregate)
         return orderAggregate
 
     async def _store_order_items(self, order_id: UUID, items: List[OrderItem]) -> None:
@@ -116,6 +113,7 @@ class OrderHandler:
         reserved_any = False
         try:
             response = await self.gateway_client.reserve_products_batch(order_id, item_list)
+            DebugWarning(response)
             results = response["results"]  #{"results": [{"product_id": "uuid", "success": true/false} , reserved_any: true/false]}
             for item, result in zip(items, results):
                 if result["success"]:

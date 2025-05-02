@@ -16,6 +16,13 @@ class Order(BaseModel, AuditMixin):
     invoice_id: UUID
     status: OrderStatus = OrderStatus.PENDING
 
+    def get_total_item(self) -> int:
+        return sum([item.quantity for item in self.items])
+
+    def get_total_amount(self) -> float:
+        return  sum(item.quantity * item.price_at_order for item in self.items)
+
+
     def confirm(self):
         self.status = OrderStatus.CONFIRMED
 
