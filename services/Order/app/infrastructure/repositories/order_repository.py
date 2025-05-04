@@ -99,3 +99,26 @@ class OrderRepository(IOrderRepository):
                 self.db.add(item)
 
         await self._execute_transaction(operation)
+
+
+    async def update_order_status(self, order_id: UUID, status: str) -> bool:
+        async def operation():
+            await self.db.execute(
+                update(OrderDBModel)
+                .where(OrderDBModel.id ==order_id)
+                .values(status=status, updated_at=datetime.now())
+                .returning(OrderDBModel)
+            )
+
+        return await self._execute_transaction(operation)
+
+    async def update_order_items_status(self, order_id: UUID, status: str) -> bool:
+        async def operation():
+          await  self.db.execute(
+              update(OrderItemDBModel)
+              .where(OrderItemDBModel.order_id == order_id)
+              .values(status=status, updated_at=datetime.now())
+              .returning(OrderItemDBModel)
+          )
+
+        return await self._execute_transaction(operation)

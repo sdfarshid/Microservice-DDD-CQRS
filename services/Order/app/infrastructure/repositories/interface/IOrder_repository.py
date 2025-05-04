@@ -38,3 +38,11 @@ class IOrderRepository(ABC):
     @abstractmethod
     async def update_order_item(self, item_id: UUID, status: str) -> InvoiceDBModel | None:
         pass
+
+    @abstractmethod
+    async def update_order_status(self, order_id: UUID, status: str) -> bool:
+        pass
+
+    @abstractmethod
+    async def update_order_items_status(self, order_id: UUID, status: str) -> bool:
+        pass

@@ -66,4 +66,10 @@ class GatewayClient:
             DebugError(f"Unexpected error occurred: {e} - {full_url}")
             raise ValueError(f"Unexpected error: {e}")
 
+    async def release_products(self, order_id):
+        return await self.call_api(
+            method="PUT",
+            endpoint=f"product/release/{order_id}",
+        )
+
 

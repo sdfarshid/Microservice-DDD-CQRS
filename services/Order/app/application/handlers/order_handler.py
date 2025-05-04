@@ -9,6 +9,7 @@ from app.application.commands.create_order import CreateOrderCommand, OrderItemC
 from app.domain.order.aggregates.order import Order
 from app.domain.order.entities.invoice import Invoice
 from app.domain.order.entities.order_item import OrderItem
+from app.domain.order.enums.invoice_status import InvoiceStatus
 from app.domain.order.enums.item_status import ItemStatus
 from app.domain.order.enums.order_status import OrderStatus
 from app.infrastructure import message_broker
@@ -26,33 +27,37 @@ class OrderHandler:
         self.message_broker = message_broker
 
     async def create(self, command: CreateOrderCommand) -> dict:
+        order = None
+        try:
+            # Calculate total amount with HTTP request to gateway and product
+            items = await self._create_order_item_with_fetching_price(command.items)
 
-        #Calculate total amount with HTTP request to gateway and product
-        items = await self._create_order_item_with_fetching_price(command.items)
+            # Store order
+            order = await self._store_orders(command, items)
 
-        #Store order
-        order = await self._store_orders(command, items)
+            # Store order items
+            await self._store_order_items(order.id, items)
 
-        #Store order items
-        await self._store_order_items(order.id, items)
+            # Store invoice
+            invoice = await self._store_invoice(order)
 
-        #Store invoice
-        invoice = await self._store_invoice(order)
+            # 1 - Reserve items just have 1 quantity
+            reserved_items = await self.__reserved_products(order.id, items)
+            if not reserved_items:
+                raise ValueError("No items available to proceed with order")
 
-        # 1 - Reserve items just have 1 quantity
-        reserved_items = await self.__reserved_products(order.id, items)
-        DebugWarning(reserved_items)
-        if not reserved_items:
-            await self.__cansel_order(order.id)
-            raise ValueError("No items available to proceed with order")
+            payment_response = await self._call_payment(invoice)
 
-        payment_response = await self._call_payment(invoice)
+            return {
+                "invoice": invoice,
+                "payment_url": payment_response["payment_url"],
 
-        return {
-            "invoice": invoice,
-            "payment_url": payment_response["payment_url"],
+            }
+        except Exception as e:
+            if order:
+                await self.__cansel_order(order)
+            raise e
 
-        }
 
     async def check_expired_orders(self):
         expired_invoices = await self.repository.get_expired_pending_invoices()
@@ -137,6 +142,28 @@ class OrderHandler:
                 await self.repository.update_order_item(item_id=item.id, status=item.status.value)
             return False
 
+    async def _call_payment(self, invoice) -> dict :
+        try:
+            return await  self.gateway_client.initiate_payment(
+                invoice_id=invoice.id
+            )
+        except ValueError as error:
+            DebugError(f"Unexpected error during call_payment occurred: {error}")
+            raise ValueError(f"Unexpected error occurred: {error}")
+
+    async def __cansel_order(self, order: Order):
+        #Step 1 update order Status to CANCELED
+        #step 2 update order items to CANCELED
+        #step 3 update invoice to  FAILED
+        #step 4 Release reserved product
+
+        await self.repository.update_order_status(order.id, OrderStatus.CANCELLED.value)
+        await self.repository.update_order_items_status(order.id, OrderStatus.CANCELLED.value)
+        await self.repository.update_invoice_status(order.invoice_id, InvoiceStatus.FAILED.value)
+        await self.gateway_client.release_products(order.id)
+        raise ValueError("Failed to reserve stock")
+
+
     async def _cancel_order(self, order_id: UUID, items: List[OrderItem]):
 
         order.status = OrderStatus.CANCELLED.value
@@ -152,22 +179,6 @@ class OrderHandler:
 
         event = OrderCancelled(order_id=order_id, user_id=order.user_id)
         self.message_broker.publish("order-cancelled", event.dict())
-
-    async def __cansel_order(self, invoice_id: UUID):
-        await self.repository.update_invoice_status(invoice_id, "cancelled")
-        raise ValueError("Failed to reserve stock")
-
-    async def _call_payment(self, invoice) -> dict :
-        try:
-            return await  self.gateway_client.initiate_payment(
-                invoice_id=invoice.id
-            )
-        except ValueError as error:
-            DebugError(f"Unexpected error during call_payment occurred: {error}")
-            raise ValueError(f"Unexpected error occurred: {error}")
-
-
-
 
 
     async def _timeout_order(self, invoice_id: UUID):
