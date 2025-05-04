@@ -6,6 +6,8 @@ from app.domain.order.entities.invoice import Invoice
 from app.domain.order.aggregates.order import Order
 from app.domain.order.entities.order_item import OrderItem
 from app.domain.order.enums.invoice_status import InvoiceStatus
+from app.domain.order.enums.item_status import ItemStatus
+from app.domain.order.enums.order_status import OrderStatus
 from app.domain.order.value_objects.price import Price
 from app.infrastructure.database.models.invoice import InvoiceDBModel
 from app.infrastructure.database.models.order import OrderDBModel
@@ -42,11 +44,13 @@ class OrderMapper:
             order_id=invoice_db.order_id,
             user_id=invoice_db.user_id,
             items_total=invoice_db.items_total,
-           # discount_amount=invoice_db.discount_amount,   #  tax=invoice_db.tax,
-          #  shipping_cost=invoice_db.shipping_cost,
             total_amount=Price(value=invoice_db.total_amount),
             status=InvoiceStatus(invoice_db.status)
         )
+        #Todo:
+        # discount_amount=invoice_db.discount_amount,
+        #  tax=invoice_db.tax,
+        #  shipping_cost=invoice_db.shipping_cost,
 
     @staticmethod
     def to_invoice_orm(invoice: Invoice) -> InvoiceDBModel:
@@ -70,4 +74,23 @@ class OrderMapper:
             status=InvoiceStatus.PENDING
         )
 
+    @staticmethod
+    def to_order_domain(order_db: OrderDBModel):
+        return Order(
+            id=order_db.id,
+            user_id=order_db.user_id,
+            items=order_db.items,
+            invoice_id=order_db.invoice_id,
+            status=OrderStatus(order_db.status)
+        )
+
+    @staticmethod
+    def to_order_item_domain(orderItemDBModel : OrderItemDBModel) -> OrderItem:
+        return OrderItem(
+            id=orderItemDBModel.id,
+            product_id=orderItemDBModel.product_id,
+            quantity=orderItemDBModel.quantity,
+            price_at_order=orderItemDBModel.price_at_order,
+            status=ItemStatus(orderItemDBModel.status)
+        )
 

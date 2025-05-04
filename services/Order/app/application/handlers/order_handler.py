@@ -58,13 +58,6 @@ class OrderHandler:
                 await self.__cansel_order(order)
             raise e
 
-
-    async def check_expired_orders(self):
-        expired_invoices = await self.repository.get_expired_pending_invoices()
-        for invoice in expired_invoices:
-            #TODO:: Should change to Batch
-            await self.__cansel_order(invoice.id)
-
     async def _create_order_item_with_fetching_price(self, items: List[OrderItemCommand]) -> List[OrderItem]:
         total_amount = 0
         order_items = []
@@ -156,38 +149,16 @@ class OrderHandler:
         #step 2 update order items to CANCELED
         #step 3 update invoice to  FAILED
         #step 4 Release reserved product
-
         await self.repository.update_order_status(order.id, OrderStatus.CANCELLED.value)
         await self.repository.update_order_items_status(order.id, OrderStatus.CANCELLED.value)
         await self.repository.update_invoice_status(order.invoice_id, InvoiceStatus.FAILED.value)
         await self.gateway_client.release_products(order.id)
-        raise ValueError("Failed to reserve stock")
 
 
-    async def _cancel_order(self, order_id: UUID, items: List[OrderItem]):
-
-        order.status = OrderStatus.CANCELLED.value
-        await self.repository.update_order(order)
-
-        invoice = await self.repository.get_invoice_by_order_id(order_id)
-        if invoice:
-            await self.repository.update_invoice_status(invoice.id, InvoiceStatus.CANCELLED.value)
-
-        for item in items:
-            item.status = ItemStatus.CANCELLED
-            await self.repository.update_order_item(item)
-
-        event = OrderCancelled(order_id=order_id, user_id=order.user_id)
-        self.message_broker.publish("order-cancelled", event.dict())
-
-
-    async def _timeout_order(self, invoice_id: UUID):
-        invoice_db = await self.repository.get_invoice_by_id(invoice_id)
-        if invoice_db and invoice_db.status == "pending":
-            await self.__cansel_order(invoice_id)
-
-    def start_consuming(self):
-        for message in self.consumer:
-            event = OrderStatusUpdated(**message.value)
-            asyncio.run(self._process_payment_event(event))
+    async def check_expired_orders(self):
+        expired_invoices = await self.repository.get_expired_pending_invoices()
+        for invoice in expired_invoices:
+            #TODO:: Should change to Batch
+            order = await self.repository.get_orders_by_ids(invoice.order_id)
+            await self.__cansel_order(order)
 

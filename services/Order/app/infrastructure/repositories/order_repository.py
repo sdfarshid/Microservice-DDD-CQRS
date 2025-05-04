@@ -1,15 +1,17 @@
 from datetime import datetime, timedelta
-from typing import Sequence, List, Any, Coroutine
+from typing import Sequence, List, Any, Coroutine, Type
 from uuid import UUID
 from fastapi import Depends
 from sqlalchemy import select, update, delete, Row, RowMapping
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from app.domain.order.aggregates.order import Order
 from app.domain.order.entities.invoice import Invoice
 
 from app.config.config import settings
+from app.domain.order.entities.order_item import OrderItem
 from app.infrastructure.database.models.invoice import InvoiceDBModel
 from app.infrastructure.database.models.order import OrderDBModel
 from app.infrastructure.database.models.order_item import OrderItemDBModel
@@ -53,11 +55,14 @@ class OrderRepository(IOrderRepository):
         await self.db.refresh(order_db)
         return orderAggregate
 
-    async def get_invoice_by_id(self, invoice_id: UUID) -> InvoiceDBModel | None:
+    async def get_invoice_by_id(self, invoice_id: UUID) -> Invoice | None:
         result = await self.db.execute(
             select(InvoiceDBModel).where(InvoiceDBModel.id == invoice_id)
         )
-        return result.scalars().one_or_none()
+        invoice_db = result.scalars().one_or_none()
+        if invoice_db is None:
+            return None
+        return  OrderMapper.to_invoice_domain(invoice_db)
 
     async def update_invoice_status(self, invoice_id: UUID, status: str) -> bool:
 
@@ -71,7 +76,7 @@ class OrderRepository(IOrderRepository):
 
         return await self._execute_transaction(operation)
 
-    async def update_order_item(self, item_id: UUID, status: str) -> [OrderItemDBModel, None]:
+    async def update_order_item(self, item_id: UUID, status: str) -> OrderItem:
         async def operation():
             await self.db.execute(
                 update(OrderItemDBModel)
@@ -81,17 +86,18 @@ class OrderRepository(IOrderRepository):
             )
 
         await self._execute_transaction(operation)
-        return OrderItemDBModel
+        return OrderMapper.to_order_item_domain(OrderItemDBModel)
 
 
-    async def get_expired_pending_invoices(self) -> Sequence[InvoiceDBModel]:
+    async def get_expired_pending_invoices(self) -> List[Invoice]:
         threshold = datetime.now() - timedelta(seconds=settings.get_expired_time())
         result = await self.db.execute(
             select(InvoiceDBModel)
             .where(InvoiceDBModel.status == "pending")
             .where(InvoiceDBModel.created_at <= threshold)
         )
-        return result.scalars().all()
+        invoice_db_list =  result.scalars().all()
+        return [OrderMapper.to_invoice_domain(invoice_db) for invoice_db in invoice_db_list]
 
     async def add_order_items_batch(self, order_items: List[OrderItemDBModel]) -> None:
         async def operation():
@@ -122,3 +128,14 @@ class OrderRepository(IOrderRepository):
           )
 
         return await self._execute_transaction(operation)
+
+
+    async def get_orders_by_ids(self, order_id: UUID) -> Order | None:
+        result = await self.db.execute(
+            select(OrderDBModel).where(OrderDBModel.id == order_id)
+        )
+        order_db = result.scalars().one_or_none()
+        if order_db is not None:
+            return OrderMapper.to_order_domain(order_db)
+        return None
+
