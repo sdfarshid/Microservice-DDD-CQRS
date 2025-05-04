@@ -12,6 +12,9 @@ class OrderService:
     ):
         self.handler = order_handler
 
-    async def create_order(self, command: CreateOrderCommand) -> Invoice:
-        return await self.handler.create(command)
+    async def create_order(self, command: CreateOrderCommand) :
+        invoice = await self.handler.create(command)
+
+
+
 

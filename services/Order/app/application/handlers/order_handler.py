@@ -25,7 +25,7 @@ class OrderHandler:
         self.gateway_client = GatewayClient()
         self.message_broker = message_broker
 
-    async def create(self, command: CreateOrderCommand) -> Invoice:
+    async def create(self, command: CreateOrderCommand) -> dict:
 
         #Calculate total amount with HTTP request to gateway and product
         items = await self._create_order_item_with_fetching_price(command.items)
@@ -46,7 +46,13 @@ class OrderHandler:
             await self.__cansel_order(order.id)
             raise ValueError("No items available to proceed with order")
 
-        return invoice
+        payment_response = await self._call_payment(invoice)
+
+        return {
+            "invoice": invoice,
+            "payment_url": payment_response["payment_url"],
+
+        }
 
     async def check_expired_orders(self):
         expired_invoices = await self.repository.get_expired_pending_invoices()
@@ -151,6 +157,15 @@ class OrderHandler:
         await self.repository.update_invoice_status(invoice_id, "cancelled")
         raise ValueError("Failed to reserve stock")
 
+    async def _call_payment(self, invoice) -> dict :
+        try:
+            return await  self.gateway_client.initiate_payment(
+                invoice_id=invoice.id
+            )
+        except ValueError as error:
+            DebugError(f"Unexpected error during call_payment occurred: {error}")
+            raise ValueError(f"Unexpected error occurred: {error}")
+
 
 
 
@@ -164,3 +179,4 @@ class OrderHandler:
         for message in self.consumer:
             event = OrderStatusUpdated(**message.value)
             asyncio.run(self._process_payment_event(event))
+

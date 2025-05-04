@@ -27,10 +27,12 @@ class GatewayClient:
             json_data=json_data
         )
 
-    async def get_company(self, company_id: UUID) -> Dict[str, Any]:
-        response = await self.client.get(f"{self.gateway_url}/companies/{company_id}")
-        response.raise_for_status()
-        return response.json()
+    async def initiate_payment(self, invoice_id):
+        return  await  self.call_api(
+            method="GET",
+            endpoint=f"payment/invoice/{invoice_id}"
+        )
+
 
     async def call_api(self,
                        method: str,
@@ -63,3 +65,5 @@ class GatewayClient:
         except Exception as e:
             DebugError(f"Unexpected error occurred: {e} - {full_url}")
             raise ValueError(f"Unexpected error: {e}")
+
+
