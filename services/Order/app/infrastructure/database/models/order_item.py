@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, Float, Enum
+from sqlalchemy.orm import Relationship
 
 from app.domain.order.enums.item_status import ItemStatus
 from app.infrastructure.database.mixins.audit_mixin import AuditMixin
@@ -14,3 +15,5 @@ class OrderItemDBModel(Base, AuditMixin):
     quantity = Column(Integer, nullable=False)
     price_at_order = Column(Float, nullable=False)
     status = Column(Enum(ItemStatus, name='item_status'), nullable=False, default=ItemStatus.PENDING.value)
+
+    order = Relationship("OrderItemDBModel", back_populates="items", lazy="dynamic")

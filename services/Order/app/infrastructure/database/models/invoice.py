@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, DateTime, Float, Integer, UUID, Enum
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy.orm import Relationship
 
 from app.domain.order.enums.invoice_status import InvoiceStatus
 from app.infrastructure.database.mixins.audit_mixin import AuditMixin
@@ -14,6 +15,8 @@ class InvoiceDBModel(Base, AuditMixin):
     items_total = Column(Integer, nullable=False)
     total_amount = Column(Float, nullable=False)
     status = Column(Enum(InvoiceStatus, name='invoice_status'), nullable=False, default=InvoiceStatus.PENDING.value)
+
+    order = Relationship("OrderDBModel", back_populates="invoice", uselist=False, lazy="select")
 
     def __str__(self):
         return f"Invoice {self.id}"
