@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, DateTime, Float, Integer, UUID, Enum
+from sqlalchemy import Column, String, DateTime, Float, Integer, UUID, Enum, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Relationship
 
@@ -10,7 +10,7 @@ from app.infrastructure.database.session import Base
 class InvoiceDBModel(Base, AuditMixin):
     __tablename__ = 'invoices'
     id = Column(PG_UUID(as_uuid=True), primary_key=True)
-    order_id = Column(PG_UUID(as_uuid=True), nullable=False, index=True)
+    order_id = Column(PG_UUID(as_uuid=True), ForeignKey("orders.id"),  nullable=False, index=True)
     user_id = Column(PG_UUID(as_uuid=True), nullable=False, index=True)
     items_total = Column(Integer, nullable=False)
     total_amount = Column(Float, nullable=False)
