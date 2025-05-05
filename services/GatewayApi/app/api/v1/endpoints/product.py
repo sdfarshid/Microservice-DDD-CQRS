@@ -2,7 +2,6 @@ from typing import Annotated, List, Optional
 from uuid import UUID
 from fastapi import APIRouter, Request, Depends, HTTPException, Query
 
-from app.services.product.actions import ReserveProductCommand
 from app.config.config import settings
 from app.utilities.log import DebugError, DebugWaring
 
@@ -34,6 +33,11 @@ async def create_product(command: dict):
 async def reserve_product(command: dict):
     return await call_api(method="POST", endpoint=f"{PRODUCT_BASE_URL}/reserve", json_data=command)
 
+@router.put("/release")
+@handle_exceptions
+async def release_reserve_product(command: dict):
+    return await call_api(method="PUT", endpoint=f"{PRODUCT_BASE_URL}/release", json_data=command)
+
 
 @router.get("/", response_model=List[dict])
 @handle_exceptions
@@ -58,13 +62,3 @@ async def update_product(product_id: UUID, command: dict):
 @handle_exceptions
 async def delete_product(product_id: UUID):
     return await call_api(method="DELETE", endpoint="{PRODUCT_BASE_URL}/{product_id}")
-
-
-@router.post("/reserve")
-@handle_exceptions
-async def reserve_product(command: ReserveProductCommand):
-    return await call_api(
-        method="POST",
-        endpoint=f"{PRODUCT_BASE_URL}/reserve",
-        json_data=command.model_dump()
-    )

@@ -124,3 +124,43 @@ class ProductService:
                 DebugError(f"ValueError: {e}")
 
         return {"results": results, "reserved_any": reserved_any}
+
+    async def release_reserved_products(self, command: ReserveProductCommand) -> dict:
+        """
+        Reserves stock for a list of items in an order.
+        Args:
+            command ReserveProductCommand.(List[dict]): List of items to reserve, e.g.,
+                    [{"product_id": "uuid", "quantity": int}]
+
+        Returns:
+            dict: Results of the reservation process, e.g.,
+             {"results": [{"product_id": "uuid", "success": true/false, "reason": "if failed"}]}
+        """
+        results = []
+        reserved_any = False
+        items = command.items
+        order_id = command.order_id
+        product_ids = [ item.product_id for item in items]
+
+        getBatchQuery = GetProductByIdsQuery(product_ids=product_ids)
+        products = await self.product_handler.get_batch_product_by_ids(getBatchQuery)
+        product_dict = { product.id: product  for product in products }
+
+        for item in items:
+            product_id = item.product_id
+            quantity = item.quantity
+
+            product = product_dict.get(product_id)
+            if not product:
+                results.append({"product_id": str(product_id), "success": False, "reason": "Product not found"})
+                continue
+            try:
+                product.release_stock(quantity)
+                product_data = ProductMapper.to_db_dict(product)
+                await self.product_handler.update((product_id, product_data))
+                reserved_any =True
+                results.append({"product_id": str(product_id), "success": True})
+            except ValueError as e:
+                DebugError(f"ValueError: {e}")
+
+        return {"results": results, "reserved_any": reserved_any}

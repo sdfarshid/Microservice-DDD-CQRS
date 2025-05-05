@@ -69,6 +69,20 @@ async def get_product(product_id: UUID, service: ProductServiceDependency):
         raise HTTPException(status_code=505, detail=str(error))
 
 
+@router.put("/release")
+async def release_reserved_products(command: ReserveProductCommand, service: ProductServiceDependency):
+    try:
+        DebugError(f"Error reserving products: {command.model_dump()}")
+        result = await service.release_reserved_products(command)
+        return result
+    except ValueError as value_error:
+        raise HTTPException(status_code=400, detail=str(value_error))
+    except Exception as error:
+        DebugError(f"Error reserving products: {error}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+
 @router.put("/{product_id}", response_model=ProductResponse)
 async def update_product(product_id: UUID, command: UpdateProductCommand, service: ProductServiceDependency):
     try:
@@ -113,4 +127,5 @@ async def reserve_product(command: ReserveProductCommand, service: ProductServic
     except Exception as error:
         DebugError(f"Error reserving products: {error}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
 

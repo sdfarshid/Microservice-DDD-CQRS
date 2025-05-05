@@ -26,3 +26,10 @@ class Product(BaseModel, AuditMixin):
             raise ValueError("The quantity cannot be less than the reserved stock")
         self.stock -= quantity
         self.reserved_stock += quantity
+
+    def release_stock(self,quantity: int) -> None:
+        if self.reserved_stock <= 0 :
+            raise ValueError("The reserved stock is empty")
+        self.stock += quantity
+        self.reserved_stock -= quantity
+
