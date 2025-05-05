@@ -113,7 +113,6 @@ class OrderHandler:
     async def __reserved_products(self, order_id: UUID, items: list[OrderItem]) -> bool:
         item_list = [{"product_id": str(item.product_id), "quantity": item.quantity} for item in items]
         #[{"product_id": "uuid", "quantity": int}]
-        DebugError(f"Unexpected error occurred: {type(item_list)} - {item_list}")
         reserved_any = False
         try:
             response = await self.gateway_client.reserve_products_batch(order_id, item_list)
@@ -152,7 +151,7 @@ class OrderHandler:
         await self.repository.update_order_status(order.id, OrderStatus.CANCELLED.value)
         await self.repository.update_order_items_status(order.id, OrderStatus.CANCELLED.value)
         await self.repository.update_invoice_status(order.invoice_id, InvoiceStatus.FAILED.value)
-        await self.gateway_client.release_products(order.id)
+        await self.__release_products(order.id,order.items)
 
 
     async def check_expired_orders(self):
@@ -161,4 +160,15 @@ class OrderHandler:
             #TODO:: Should change to Batch
             order = await self.repository.get_orders_by_ids(invoice.order_id)
             await self.__cansel_order(order)
+
+
+    async def __release_products(self, order_id: UUID, items: list[OrderItem]):
+        item_list = [{"product_id": str(item.product_id), "quantity": item.quantity} for item in items]
+        #[{"product_id": "uuid", "quantity": int}]
+        try:
+            response = await self.gateway_client.release_reserved_products_batch(order_id, item_list)
+            DebugWarning(response)
+        except ValueError as error:
+            DebugWarning(f"Failed to release products: {error}")
+            return False
 
