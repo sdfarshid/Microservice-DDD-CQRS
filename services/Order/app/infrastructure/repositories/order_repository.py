@@ -132,7 +132,9 @@ class OrderRepository(IOrderRepository):
 
     async def get_orders_by_ids(self, order_id: UUID) -> Order | None:
         result = await self.db.execute(
-            select(OrderDBModel).where(OrderDBModel.id == order_id)
+            select(OrderDBModel)
+            .where(OrderDBModel.id == order_id)
+            .options(joinedload(OrderDBModel.items))
         )
         order_db = result.scalars().one_or_none()
         if order_db is not None:
