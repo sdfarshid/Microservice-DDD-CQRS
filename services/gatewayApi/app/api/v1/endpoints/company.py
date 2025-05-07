@@ -36,8 +36,11 @@ async def create(command: CreateCompanyCommand):
 
 @router.get("/companies")
 @handle_exceptions
-async def release_reserve_product(command: dict):
-    return await call_api(method="PUT", endpoint=f"{PRODUCT_BASE_URL}/release", json_data=command)
+async def list_companies(
+        pagination: PaginationParams = Depends(get_pagination_params)
+):
+    return await call_api(method="GET", endpoint=f"{COMPANY_BASE_URL}/companies", params=pagination.model_dump())
+
 
 
 @router.get("/", response_model=List[dict])
