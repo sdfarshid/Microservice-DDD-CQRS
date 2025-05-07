@@ -33,7 +33,8 @@ async def create(command: CreateCompanyCommand):
     return await call_api(method="POST", endpoint=f"{COMPANY_BASE_URL}/create", json_data=command.model_dump())
 
 
-@router.put("/release")
+
+@router.get("/companies")
 @handle_exceptions
 async def release_reserve_product(command: dict):
     return await call_api(method="PUT", endpoint=f"{PRODUCT_BASE_URL}/release", json_data=command)
