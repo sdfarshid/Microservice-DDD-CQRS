@@ -29,8 +29,9 @@ async def create_product(command: dict):
 
 @router.post("/create")
 @handle_exceptions
-async def reserve_product(command: dict):
-    return await call_api(method="POST", endpoint=f"{PRODUCT_BASE_URL}/reserve", json_data=command)
+async def create(command: CreateCompanyCommand):
+    return await call_api(method="POST", endpoint=f"{COMPANY_BASE_URL}/create", json_data=command.model_dump())
+
 
 @router.put("/release")
 @handle_exceptions
