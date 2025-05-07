@@ -27,8 +27,7 @@ async def get_product(product_id: UUID):
 async def create_product(command: dict):
     return await call_api(method="POST", endpoint=f"{PRODUCT_BASE_URL}/", json_data=command)
 
-
-@router.post("/reserve")
+@router.post("/create")
 @handle_exceptions
 async def reserve_product(command: dict):
     return await call_api(method="POST", endpoint=f"{PRODUCT_BASE_URL}/reserve", json_data=command)
