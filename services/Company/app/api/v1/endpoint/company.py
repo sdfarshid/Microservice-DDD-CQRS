@@ -18,8 +18,8 @@ router = APIRouter()
 ProductServiceDependency = Annotated[CompanyService, Depends(CompanyService)]
 
 
-@router.post("/register")
-async def register(command: CreateCompanyCommand, service: ProductServiceDependency):
+@router.post("/create")
+async def create(command: CreateCompanyCommand, service: ProductServiceDependency):
     try:
         company_id = await service.create_company(command)
         return {"message": "Company created successfully", "company_id": company_id}
@@ -33,10 +33,7 @@ async def register(command: CreateCompanyCommand, service: ProductServiceDepende
 
 
 @router.get("/companies", response_model=List[CompanyResponse])
-async def list_companies(
-        service: ProductServiceDependency,
-        pagination: PaginationParams = Depends(get_pagination_params)
-):
+async def list_companies(  service: ProductServiceDependency,  pagination: PaginationParams = Depends(get_pagination_params)):
     query = ListCompaniesQuery(pagination=pagination)
     return await service.list_companies(query)
 
