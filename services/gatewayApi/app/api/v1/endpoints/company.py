@@ -1,37 +1,27 @@
 from typing import Annotated, List, Optional
 from uuid import UUID
 from fastapi import APIRouter, Request, Depends, HTTPException, Query
+from pydantic import BaseModel, Field
 
 from app.config.config import settings
 from app.utilities.log import DebugError, DebugWaring
-
 from app.utilities.helper import handle_exceptions, call_api
 
-router = APIRouter(tags=["product"])
+from shared.domain.company.commands.create_company import CreateCompanyCommand
+from shared.domain.company.commands.update_company import UpdateCompanyCommand
+from shared.mixins.pagination import PaginationParams, get_pagination_params
 
-PRODUCT_SERVICE_URL = settings.PRODUCT_SERVICE_URL
-BASE_PATH = "api/v1/product"
-PRODUCT_BASE_URL = f"{PRODUCT_SERVICE_URL}{BASE_PATH}"
-
-DebugError(f"PRODUCT_BASE_URL: {PRODUCT_BASE_URL}")
+router = APIRouter(tags=["company"])
 
 
-@router.get("/{product_id}")
-@handle_exceptions
-async def get_product(product_id: UUID):
-    return await call_api(method="GET", endpoint=f"{PRODUCT_BASE_URL}/{product_id}")
+COMPANY_BASE_URL = settings.get_service_url("company")
 
-
-@router.post("/")
-@handle_exceptions
-async def create_product(command: dict):
-    return await call_api(method="POST", endpoint=f"{PRODUCT_BASE_URL}/", json_data=command)
+DebugWaring(COMPANY_BASE_URL)
 
 @router.post("/create")
 @handle_exceptions
 async def create(command: CreateCompanyCommand):
     return await call_api(method="POST", endpoint=f"{COMPANY_BASE_URL}/create", json_data=command.model_dump())
-
 
 
 @router.get("/companies")
@@ -43,26 +33,29 @@ async def list_companies(
 
 
 
-@router.get("/", response_model=List[dict])
+@router.get("/{company_id}")
 @handle_exceptions
-async def list_products(
-        company_id: Optional[UUID] = Query(None, description="ID of the company to filter products"),
-        page: int = Query(1, ge=1),
-        page_size: int = Query(10, ge=1, le=100)
-):
-    params = {"page": page, "page_size": page_size}
-    if company_id:
-        params["company_id"] = str(company_id)
-    return await call_api(method="GET", endpoint=f"{PRODUCT_BASE_URL}", params=params)
+async def get_company(company_id: UUID):
+    return await call_api(method="GET", endpoint=f"{COMPANY_BASE_URL}/{company_id}")
 
 
-@router.put("/{product_id}")
+@router.patch("/{company_id}")
 @handle_exceptions
-async def update_product(product_id: UUID, command: dict):
-    return await call_api(method="PUT", endpoint=f"{PRODUCT_BASE_URL}/{product_id}", json_data=command)
+async def update_company(company_id: UUID, update_data: UpdateCompanyCommand):
+    return await call_api(
+        method="PATCH",
+        endpoint=f"{COMPANY_BASE_URL}/{company_id}",
+        json_data=update_data.model_dump()
+    )
 
 
-@router.delete("/{product_id}")
+@router.delete("/{company_id}")
 @handle_exceptions
-async def delete_product(product_id: UUID):
-    return await call_api(method="DELETE", endpoint="{PRODUCT_BASE_URL}/{product_id}")
+async def delete_company(company_id: UUID):
+    response = await call_api(method="DELETE", endpoint=f"{COMPANY_BASE_URL}/{company_id}")
+    return response
+
+
+
+
+
