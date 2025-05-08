@@ -16,7 +16,6 @@ router = APIRouter(tags=["company"])
 
 COMPANY_BASE_URL = settings.get_service_url("company")
 
-DebugWaring(COMPANY_BASE_URL)
 
 @router.post("/create")
 @handle_exceptions
