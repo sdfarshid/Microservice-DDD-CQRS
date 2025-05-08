@@ -46,6 +46,7 @@ class OrderMapper:
             items_total=invoice_db.items_total,
             total_amount=Price(value=invoice_db.total_amount),
             status=InvoiceStatus(invoice_db.status)
+
         )
         #Todo:
         # discount_amount=invoice_db.discount_amount,
