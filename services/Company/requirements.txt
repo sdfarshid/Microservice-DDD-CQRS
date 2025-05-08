@@ -9,3 +9,4 @@ passlib
 python-dotenv
 pyjwt[crypto]
 bcrypt
+ppc-share
