@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+  gateway_db:
+    image: postgres
+    container_name: gateway_service_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_GATEWAY}
+    ports:
+      - "${POSTGRES_PORT_ORDER}:5432"
+    volumes:
+      - gateway_postgres_data:/var/lib/postgresql/data
+
+  gateway_app:
+    build:
+      context: ../
+      dockerfile: gatewayApi/Dockerfile.prod
+    container_name: gateway_service_app
+    depends_on:
+      - gateway_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_GATEWAY}
+      POSTGRES_HOST: ${POSTGRES_HOST_GATEWAY}
+      POSTGRES_PORT: ${POSTGRES_PORT_GATEWAY}
+      APP_PORT: ${APP_PORT_GATEWAY}
+    ports:
+      - "${APP_PORT_GATEWAY}:8000"
+    volumes:
+      - ./app:/app/app
+      - ../shared:/app/shared
+      - ./app/logs:/app/logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  gateway_postgres_data:

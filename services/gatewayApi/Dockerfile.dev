@@ -1,0 +1,21 @@
+FROM python:3.10
+
+WORKDIR /app
+
+#Copy all shared
+COPY shared /app/shared
+
+#Copy all file to container
+COPY gatewayApi /app
+
+COPY gatewayApi/requirements.txt /app/requirements.txt
+
+#install pip and dependencies
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN mkdir -p /app/logs && \
+    chmod -R 777 /app/logs
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

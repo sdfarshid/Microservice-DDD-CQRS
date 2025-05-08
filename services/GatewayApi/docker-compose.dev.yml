@@ -14,8 +14,8 @@ services:
       - gateway_postgres_data:/var/lib/postgresql/data
   gateway_app:
     build:
-      context: .
-      dockerfile: Dockerfile.dev
+      context: ../
+      dockerfile: gatewayApi/Dockerfile.dev
     container_name: gateway_service_app
     depends_on:
       - gateway_db
@@ -29,7 +29,8 @@ services:
     ports:
       - "${APP_PORT_GATEWAY}:8000"
     volumes:
-      - .:/app
+      - ./app:/app/app
+      - ../shared:/app/shared
       - ./app/logs:/app/logs
     logging:
       driver: "json-file"
