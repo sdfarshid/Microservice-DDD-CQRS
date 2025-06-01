@@ -1,8 +1,5 @@
-
-
 from fastapi import FastAPI
 from app.api.v1.routers import api_router
-from app.infrastructure.database.session import init_db
 from app.utilities.log import logger
 
 app = FastAPI(    title="API Gateway",
@@ -12,15 +9,6 @@ app = FastAPI(    title="API Gateway",
                   )
 
 app.include_router(api_router)
-
-@app.on_event("startup")
-async def on_startup():
-    print(" Running database initialization...")
-    await init_db()
-
-
-
-
 
 @app.get("/")
 async def root():

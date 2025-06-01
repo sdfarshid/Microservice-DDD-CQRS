@@ -1,30 +1,15 @@
 from __future__ import annotations
 
-from datetime import datetime
-from uuid import UUID
+import datetime
 
-from pydantic import BaseModel
-
-from app.domain.company.commands.create_company import CreateCompanyCommand
-from app.domain.company.commands.update_company import UpdateCompanyCommand
-from app.domain.company.models.company import Company
-from app.domain.company.models.value_objects.address import Address
-from app.domain.company.models.value_objects.company_name import CompanyName
-from app.domain.company.models.value_objects.registration_number import RegistrationNumber
+from app.domain import RegistrationNumber, CompanyName, Address, CompanyStatus
+from app.domain.aggregates import Company
+from shared import CreateCompanyCommand, CompanyResponse, UpdateCompanyCommand
 from app.infrastructure.database.models.company import CompanyDBModel
 
 
-class CompanyResponse(BaseModel):
-    id: UUID
-    name: str
-    provider_id: UUID
-    registration_number: str
-    address: str
-    website: str | None = None
-    status: str = "active"
-
-
-class CompanyMapper():
+class CompanyMapper:
+    """Mapper to transform between domain models and DTOs"""
 
     @staticmethod
     def convert_command_to_domain_model(command: CreateCompanyCommand) -> Company:
@@ -34,7 +19,7 @@ class CompanyMapper():
             registration_number=RegistrationNumber(value=command.registration_number),
             address=Address(value=command.address),
             website=command.website,
-            status=command.status,
+            status=CompanyStatus(value=command.status),
         )
 
     @staticmethod
@@ -46,8 +31,8 @@ class CompanyMapper():
             registration_number=RegistrationNumber(value=orm_model.registration_number),
             address=Address(value=orm_model.address),
             website=orm_model.website,
-            status=orm_model.status,
-            created_at=orm_model.created_at,
+            status=CompanyStatus(value=orm_model.status),
+            created_at=orm_model.created_at or datetime.utcnow(),
             updated_at=orm_model.updated_at
         )
 
@@ -60,7 +45,7 @@ class CompanyMapper():
             registration_number=domain_model.registration_number.value,
             address=domain_model.address.value,
             website=domain_model.website,
-            status=domain_model.status,
+            status=domain_model.status.value,
             created_at=domain_model.created_at,
             updated_at=domain_model.updated_at
         )
@@ -74,6 +59,29 @@ class CompanyMapper():
             registration_number=domain_model.registration_number.value,
             address=domain_model.address.value,
             website=domain_model.website,
-            status=domain_model.status,
+            status=domain_model.status.value,
         )
 
+    def update_to_company(self, command: UpdateCompanyCommand, company: Company) -> Company:
+        return Company(
+            id=company.id,
+            name=CompanyName(value=command.name) if command.name else company.name,
+            provider_id=company.provider_id,
+            registration_number=RegistrationNumber(
+                value=command.registration_number) if command.registration_number else company.registration_number,
+            address=Address(value=command.address) if command.address else company.address,
+            website=command.website if command.website else company.website,
+            status=CompanyStatus(value=command.status) if command.status else company.status,
+            created_at=company.created_at
+        )
+
+    @staticmethod
+    def to_update_dict(domain_model: Company) -> dict:
+        return {
+            "name": domain_model.name.value,
+            "registration_number": domain_model.registration_number.value,
+            "address": domain_model.address.value,
+            "website": domain_model.website,
+            "status": domain_model.status.value,
+            "updated_at": domain_model.updated_at,
+        }

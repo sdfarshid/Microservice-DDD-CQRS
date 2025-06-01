@@ -3,63 +3,49 @@ from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Depends
 
-from app.domain.company.commands.create_company import CreateCompanyCommand
-from app.domain.company.commands.delete_company import DeleteCompanyCommand
-from app.domain.company.commands.update_company import UpdateCompanyCommand
-from app.domain.company.queries.get_company_by_id import GetCompanyByIdQuery
-from app.domain.company.queries.list_companies import ListCompaniesQuery
-from app.domain.company.services.company_service import CompanyService
-from app.domain.mixins.pagination import PaginationParams, get_pagination_params
-from app.infrastructure.mappers.company_mapper import CompanyResponse
+from app.application.services.company_service import CompanyService
+from app.config.dependencies import get_company_service
+from app.utilities.helper import handle_exceptions
 from app.utilities.log import logger, DebugError, DebugWaring
+from shared import (CreateCompanyCommand, CompanyResponse,
+                    ListCompaniesQuery, UpdateCompanyCommand, GetCompanyByIdQuery)
+from shared.mixins import PaginationParams, get_pagination_params
 
 router = APIRouter()
 
-ProductServiceDependency = Annotated[CompanyService, Depends(CompanyService)]
+CompanyServiceDependency = Annotated[CompanyService, Depends(get_company_service)]
 
 
 @router.post("/create")
-async def create(command: CreateCompanyCommand, service: ProductServiceDependency):
-    try:
-        company_id = await service.create_company(command)
-        return {"message": "Company created successfully", "company_id": company_id}
-    except ValueError as value_error:
-        raise HTTPException(status_code=409, detail=str(value_error))
-    except HTTPException as http_error:
-        raise http_error
-    except Exception as error:
-        DebugError(f"Error: {error}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+@handle_exceptions
+async def create(command: CreateCompanyCommand, service: CompanyServiceDependency):
+    company_id = await service.create_company(command)
+    return {"message": "Company created successfully", "company_id": company_id}
 
 
 @router.get("/companies", response_model=List[CompanyResponse])
-async def list_companies(  service: ProductServiceDependency,  pagination: PaginationParams = Depends(get_pagination_params)):
+@handle_exceptions
+async def list_companies(service: CompanyServiceDependency,
+                         pagination: PaginationParams = Depends(get_pagination_params)):
     query = ListCompaniesQuery(pagination=pagination)
     return await service.list_companies(query)
 
 
 @router.get("/{company_id}", response_model=CompanyResponse)
-async def get_company(company_id: UUID, service: ProductServiceDependency):
-    try:
-        return await service.get_company_by_id(company_id)
-    except ValueError as value_error:
-        raise HTTPException(status_code=404, detail="Company not found")
-    except Exception as error:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+@handle_exceptions
+async def get_company(company_id: UUID, service: CompanyServiceDependency):
+    return await service.get_company_by_id(GetCompanyByIdQuery(company_id=company_id))
 
 
 @router.patch("/{company_id}", response_model=CompanyResponse)
-async def update_company(updateData: UpdateCompanyCommand, service: ProductServiceDependency):
-    try:
-        return await service.update_company(updateData)
-    except ValueError as value_error:
-        raise HTTPException(status_code=404, detail="Company not found")
-    except Exception as error:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+@handle_exceptions
+async def update_company(updateData: UpdateCompanyCommand, service: CompanyServiceDependency):
+    return await service.update_company(updateData)
 
 
 @router.delete("/{company_id}")
-async def delete_company(company_id: UUID, service: ProductServiceDependency):
+@handle_exceptions
+async def delete_company(company_id: UUID, service: CompanyServiceDependency):
     success = await service.delete_company(company_id)
     if not success:
         raise HTTPException(status_code=404, detail="Company not found")

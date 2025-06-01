@@ -1,8 +1,7 @@
-from datetime import datetime
-
 from pydantic import BaseModel
 from uuid import UUID
 from typing import Optional
+
 
 class UpdateCompanyCommand(BaseModel):
     company_id: UUID

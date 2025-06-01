@@ -14,8 +14,8 @@ services:
       - company_postgres_data:/var/lib/postgresql/data
   company_app:
     build:
-      context: .
-      dockerfile: Dockerfile.dev
+      context: ../
+      dockerfile: Company/Dockerfile.dev
     container_name: company_service_app
     depends_on:
       - company_db
@@ -29,7 +29,8 @@ services:
     ports:
       - "${APP_PORT_COMPANY}:8000"
     volumes:
-      - .:/app
+      - ./app:/app/app
+      - ../shared:/app/shared
       - ./app/logs:/app/logs
     logging:
       driver: "json-file"
