@@ -1,13 +1,13 @@
 from fastapi import Depends
 
-from app.domain.user.commands.auth.login_user import LoginUserCommand
 from app.domain.user.handlers.interfaces.Iquery_handler import IQueryHandler
 from app.domain.user.handlers.interfaces.Icommand_handler import ICommandHandler, T, R
 from app.domain.user.handlers.user.get_user_by_email_handler import GetUserByEmailHandler
 from app.domain.user.models.user import User
-from app.domain.user.queries.get_user_by_email import GetUserByEmailQuery
 from app.utilities.jwt_util import TokenData, create_access_token, create_refresh_token
 from app.utilities.security import verify_password
+from shared.domain.user import GetUserByEmailQuery
+from shared.domain.user.commands import LoginUserCommand
 
 
 class LoginHandler(ICommandHandler[LoginUserCommand, dict]):
@@ -17,10 +17,9 @@ class LoginHandler(ICommandHandler[LoginUserCommand, dict]):
         self.get_user_handler = get_user_handler
 
     async def handle(self, command: LoginUserCommand) -> dict:
-        query = GetUserByEmailQuery(command.email)
-        user = await self.get_user_handler.handle(query)
+        user = await self.get_user_handler.handle(GetUserByEmailQuery(command.email))
 
-        if not user or not verify_password(plain_password=command.password.value,
+        if not user or not verify_password(plain_password=command.password,
                                            hashed_password=user.password):
             raise ValueError("Invalid credentials")
 

@@ -1,8 +1,9 @@
-from app.domain.user.models.user import User
+from app.domain.user.models.user import User, UserResponse
 from app.domain.user.value_objects.Email import Email
 from app.infrastructure.database.models.user import UserDBModel
 
-class UserMapper():
+
+class UserMapper:
     @staticmethod
     def to_domain(orm_model: UserDBModel) -> User:
         return User(
@@ -24,3 +25,12 @@ class UserMapper():
             created_at=domain_model.created_at,
             updated_at=domain_model.updated_at
         )
+
+    @staticmethod
+    def to_response(domain_model: User) -> UserResponse:
+        return UserResponse(
+            id=domain_model.id,
+            email=domain_model.email.value,
+            is_active=domain_model.is_active,
+        )
+

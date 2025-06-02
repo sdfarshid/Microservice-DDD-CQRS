@@ -1,10 +1,9 @@
 from fastapi import Depends
 
-from ....user.handlers.interfaces.Iquery_handler import IQueryHandler, T, R
-from ....user.models.user import User
-from ....user.queries.list_users_query import ListUsersQuery
-from app.infrastructure.repositories.Interfaces.Iuser_interface import IUserRepository
+from app.domain import IUserRepository, User
+from app.domain.user.handlers.interfaces.Iquery_handler import IQueryHandler
 from app.infrastructure.repositories.user_repository import UserRepository
+from shared.domain.user import ListUsersQuery
 
 
 class list_user_handler(IQueryHandler[ListUsersQuery, User]):

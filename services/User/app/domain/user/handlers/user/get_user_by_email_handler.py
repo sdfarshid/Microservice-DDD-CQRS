@@ -1,11 +1,9 @@
 from fastapi import Depends
 
+from app.domain import User, IUserRepository
 from app.domain.user.handlers.interfaces.Iquery_handler import IQueryHandler
-from app.domain.user.models.user import User
-from app.domain.user.queries.get_user_by_email import GetUserByEmailQuery
-from app.infrastructure.mappers.user_mapper import UserMapper
-from app.infrastructure.repositories.Interfaces.Iuser_interface import IUserRepository
 from app.infrastructure.repositories.user_repository import UserRepository
+from shared.domain.user import GetUserByEmailQuery
 
 
 class GetUserByEmailHandler(IQueryHandler[GetUserByEmailQuery, User]):
@@ -13,7 +11,7 @@ class GetUserByEmailHandler(IQueryHandler[GetUserByEmailQuery, User]):
         self.user_repository = user_repository
 
     async def handle(self, query: GetUserByEmailQuery) -> User:
-        user_db = await self.user_repository.get_user_by_email(query.email.value)
-        if not user_db:
+        user = await self.user_repository.get_user_by_email(query.email)
+        if not user:
             raise ValueError("User not found")
-        return UserMapper.to_domain(user_db)
+        return user

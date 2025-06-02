@@ -6,8 +6,13 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
 
-# `requirements.txt`
-COPY ./requirements.txt /app/requirements.txt
+#Copy all shared
+COPY shared /app/shared
+
+#Copy all file to container
+COPY User /app
+
+COPY User/requirements.txt /app/requirements.txt
 
 
 RUN pip install --no-cache-dir --upgrade pip
@@ -15,9 +20,6 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 RUN pip install --no-cache-dir gunicorn
 RUN mkdir -p /app/logs && \
     chmod -R 777 /app/logs
-
-
-COPY ./app /app
 
 EXPOSE 8000
 

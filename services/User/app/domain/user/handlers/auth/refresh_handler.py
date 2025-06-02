@@ -1,6 +1,6 @@
-from app.domain.user.commands.auth.refresh_token import RefreshTokenCommand
 from app.domain.user.handlers.interfaces.Icommand_handler import ICommandHandler
 from app.utilities.jwt_util import create_access_token, create_refresh_token, verify_token, TokenData
+from shared.domain.user.commands import RefreshTokenCommand
 
 
 class RefreshHandler(ICommandHandler[RefreshTokenCommand, dict]):

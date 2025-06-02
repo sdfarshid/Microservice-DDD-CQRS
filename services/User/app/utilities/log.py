@@ -1,6 +1,9 @@
 import logging
 import sys
+from functools import wraps
 from pathlib import Path
+
+from fastapi import HTTPException
 
 log_dir = Path(__file__).parent.parent / "logs"
 log_dir.mkdir(parents=True, exist_ok=True)
@@ -21,3 +24,27 @@ if not logger.hasHandlers():
     logger.addHandler(stream_handler)
 
 logger.debug("Logger initialized!")
+
+
+def DebugWaring(message: object) -> object:
+    logger.debug(f"⚠️⚠️ --  {message}")
+
+
+def DebugError(message):
+    logger.debug(f"🚨️ --  {message}")
+
+
+def handle_exceptions(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        try:
+            return await func(*args, **kwargs)
+        except ValueError as value_error:
+            raise HTTPException(status_code=404, detail=str(value_error))
+        except HTTPException as http_error:
+            raise http_error
+        except Exception as error:
+            DebugError(f"Error in {func.__name__}: {error}")
+            raise HTTPException(status_code=500, detail="Internal server error")
+
+    return wrapper

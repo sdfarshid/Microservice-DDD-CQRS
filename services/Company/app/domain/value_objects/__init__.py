@@ -13,4 +13,3 @@ __all__ = [
     'Address',
     'CompanyStatus'
 ]
-__all__ = ['Address', 'CompanyName', 'CompanyStatus', 'RegistrationNumber']

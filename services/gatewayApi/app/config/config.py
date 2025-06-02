@@ -26,7 +26,6 @@ class Settings(BaseSettings):
     COMPANY_SERVICE_URL: HttpUrl
     ORDER_SERVICE_URL: HttpUrl
 
-
     PUBLIC_KEY_PATH: str
     ALGORITHM: str = "RS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
@@ -38,7 +37,7 @@ class Settings(BaseSettings):
 
     @property
     def BASE_PATH(self):
-        return  os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     @property
     def PUBLIC_KEY(self):
@@ -46,7 +45,6 @@ class Settings(BaseSettings):
         with open(public_key_path, "r") as f:
             PUBLIC_KEY = f.read()
         return PUBLIC_KEY
-
 
     def get_public_key_path(self) -> str:
         public_key_full_path = os.path.join(self.BASE_PATH, self.PUBLIC_KEY_PATH)
@@ -65,19 +63,12 @@ class Settings(BaseSettings):
         }
         return service_urls.get(service_name, "Unknown service")
 
-
     def set_services_routes(self):
         self.COMPANY_BASE_URL = f"{self.COMPANY_SERVICE_URL}api/v1/company"
         self.PRODUCT_BASE_URL = f"{self.PRODUCT_SERVICE_URL}api/v1/product"
         self.ORDER_BASE_URL = f"{self.ORDER_SERVICE_URL}api/v1/order"
         self.USER_BASE_URL = f"{self.USER_SERVICE_URL}api/v1/user"
         self.API_GATEWAY_URL = f"{self.API_GATEWAY_URL}api/v1/gateway"
-
-
-
-
-
-
 
 
 settings = Settings()

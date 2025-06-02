@@ -1,4 +1,4 @@
-from app.domain.mixins.pagination import PaginationParams
+from shared.mixins import PaginationParams
 
 
 class ListUsersQuery:

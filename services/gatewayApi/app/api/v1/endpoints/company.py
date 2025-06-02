@@ -4,8 +4,9 @@ from fastapi import APIRouter, Depends
 
 from app.config.config import settings
 from app.utilities.helper import handle_exceptions, call_api
+from app.utilities.log import DebugWaring
 from shared.domain.company.commands.create_company import CreateCompanyCommand
-from shared.domain.company.commands.update_company import UpdateCompanyCommand
+from shared.domain.company.commands.update_company import UpdateCompanyRequest
 from shared.mixins.pagination import PaginationParams, get_pagination_params
 
 router = APIRouter(tags=["company"])
@@ -41,7 +42,8 @@ async def get_company(company_id: UUID):
 
 @router.patch("/{company_id}")
 @handle_exceptions
-async def update_company(company_id: UUID, update_data: UpdateCompanyCommand):
+async def update_company(company_id: UUID, update_data: UpdateCompanyRequest):
+    DebugWaring(f"the body is: {update_data}")
     return await call_api(
         method="PATCH",
         endpoint=f"{COMPANY_BASE_URL}/{company_id}",

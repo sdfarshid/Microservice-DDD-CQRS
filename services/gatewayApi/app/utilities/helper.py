@@ -16,6 +16,8 @@ async def call_api(
                    ):
     full_url = f"{endpoint.lstrip('/')}"
     DebugWaring(full_url)
+    DebugWaring(params)
+    DebugWaring(json_data)
     try:
         async with httpx.AsyncClient() as client:
             response = await client.request(
