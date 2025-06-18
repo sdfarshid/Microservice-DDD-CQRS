@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.domain.product.mixins.pagination import PaginationParams
+from shared.mixins import PaginationParams
 
 
 class ListProductsQuery(BaseModel):

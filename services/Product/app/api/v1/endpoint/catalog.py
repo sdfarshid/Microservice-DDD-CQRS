@@ -12,27 +12,13 @@ from app.domain.catalog.services.assign_catalog_service import AssignCatalogServ
 from app.domain.catalog.services.catalog_service import CatalogService
 from app.domain.catalog.mixins.pagination import PaginationParams, get_pagination_params
 from app.infrastructure.mappers.catalog_mapper import CatalogResponse
-from app.utilities.log import DebugError
+from app.utilities.log import DebugError, handle_exceptions
 
 router = APIRouter()
 
 CatalogServiceDependency = Annotated[CatalogService, Depends(CatalogService)]
 
 
-def handle_exceptions(func):
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        try:
-            return await func(*args, **kwargs)
-        except ValueError as value_error:
-            raise HTTPException(status_code=404, detail=str(value_error))
-        except HTTPException as http_error:
-            raise http_error
-        except Exception as error:
-            DebugError(f"Error in {func.__name__}: {error}")
-            raise HTTPException(status_code=500, detail="Internal server error")
-
-    return wrapper
 
 
 @router.post("/catalogs", response_model=CatalogResponse)

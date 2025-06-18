@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import Depends
 
+from app.application.product.services.product_service import ProductService
 from app.domain.catalog.commands.assign_product_to_catalogs import AssignProductToCatalogsCommand
 from app.domain.catalog.commands.update_product_catalogs import UpdateProductCatalogsCommand
 from app.domain.catalog.handlers.assign_product_to_catalog_handler import AssignProductToCatalogHandler
@@ -11,8 +12,7 @@ from app.domain.catalog.handlers.interfaces.IAssign_catalog_handler import IAssi
 from app.domain.catalog.handlers.interfaces.Icatalog_handler import ICatalogHandler
 from app.domain.catalog.queries.get_catalog_by_id import GetCatalogByIdQuery
 from app.domain.catalog.queries.get_catalogs_by_ids import GetCatalogsByIdsQuery
-from app.domain.product.queries.get_product_by_id import GetProductByIdQuery
-from app.domain.product.services.product_service import ProductService
+from shared.domain.product.queries.get_product_by_id import GetProductByIdQuery
 
 
 class AssignCatalogService:

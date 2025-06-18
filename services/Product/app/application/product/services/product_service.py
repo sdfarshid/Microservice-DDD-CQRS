@@ -4,18 +4,18 @@ from uuid import UUID
 import httpx
 from fastapi import Depends
 
+from app.application.product.handlers.interfaces.Iproduct_handler import IProductHandler
+from app.application.product.handlers.product_handler import ProductHandler
+from app.application.product.queries.get_product_by_ids import GetProductByIdsQuery
 from app.config.config import settings
-from app.domain.product.commands.create_product import CreateProductCommand
-from app.domain.product.commands.delete_product import DeleteProductCommand
-from app.domain.product.commands.update_product import UpdateProductCommand
-from app.domain.product.handlers.interfaces.Iproduct_handler import IProductHandler
-from app.domain.product.handlers.product_handler import ProductHandler
-from app.domain.product.queries.get_product_by_id import GetProductByIdQuery
-from app.domain.product.queries.get_product_by_ids import GetProductByIdsQuery
-from app.domain.product.queries.list_products import ListProductsQuery
-from app.domain.product.commands.reserve_product import ReserveProductCommand
-from app.infrastructure.mappers.product_mapper import ProductMapper, ProductResponse
+from app.infrastructure.mappers.product_mapper import ProductMapper
 from app.utilities.log import DebugWaring, DebugError
+
+from shared.domain.product.commands import CreateProductCommand, UpdateProductCommand, ReserveProductCommand
+from shared.domain.product.commands.delete_product import DeleteProductCommand
+from shared.domain.product.queries import ProductResponse
+from shared.domain.product.queries.get_product_by_id import GetProductByIdQuery
+from shared.domain.product.queries.list_products import ListProductsQuery
 
 
 class ProductService:
@@ -28,7 +28,7 @@ class ProductService:
 
     async def create_product(self, command: CreateProductCommand):
         await self.__get_company_data(command.company_id)
-        return await self.product_handler.create(command.to_domain_product())
+        return await self.product_handler.create(ProductMapper.to_domain_product(command))
 
     async def list_products(self, query: ListProductsQuery) -> list[ProductResponse]:
         listOfProductsDomainModel = await self.product_handler.list(query)
@@ -100,11 +100,11 @@ class ProductService:
         reserved_any = False
         items = command.items
         order_id = command.order_id
-        product_ids = [ item.product_id for item in items]
+        product_ids = [item.product_id for item in items]
 
         getBatchQuery = GetProductByIdsQuery(product_ids=product_ids)
         products = await self.product_handler.get_batch_product_by_ids(getBatchQuery)
-        product_dict = { product.id: product  for product in products }
+        product_dict = {product.id: product for product in products}
 
         for item in items:
             product_id = item.product_id
@@ -118,7 +118,7 @@ class ProductService:
                 product.reserve_stock(quantity)
                 product_data = ProductMapper.to_db_dict(product)
                 await self.product_handler.update((product_id, product_data))
-                reserved_any =True
+                reserved_any = True
                 results.append({"product_id": str(product_id), "success": True})
             except ValueError as e:
                 DebugError(f"ValueError: {e}")
@@ -140,11 +140,11 @@ class ProductService:
         reserved_any = False
         items = command.items
         order_id = command.order_id
-        product_ids = [ item.product_id for item in items]
+        product_ids = [item.product_id for item in items]
 
         getBatchQuery = GetProductByIdsQuery(product_ids=product_ids)
         products = await self.product_handler.get_batch_product_by_ids(getBatchQuery)
-        product_dict = { product.id: product  for product in products }
+        product_dict = {product.id: product for product in products}
 
         for item in items:
             product_id = item.product_id
@@ -158,7 +158,7 @@ class ProductService:
                 product.release_stock(quantity)
                 product_data = ProductMapper.to_db_dict(product)
                 await self.product_handler.update((product_id, product_data))
-                reserved_any =True
+                reserved_any = True
                 results.append({"product_id": str(product_id), "success": True})
             except ValueError as e:
                 DebugError(f"ValueError: {e}")

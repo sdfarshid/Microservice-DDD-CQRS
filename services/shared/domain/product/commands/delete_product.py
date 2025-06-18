@@ -3,4 +3,4 @@ from uuid import UUID
 
 
 class DeleteProductCommand(BaseModel):
-    catalog_id: UUID
+    product_id: UUID

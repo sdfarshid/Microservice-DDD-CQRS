@@ -5,7 +5,7 @@ from typing import Sequence, List
 from uuid import UUID
 
 from app.domain.catalog.models.catalog import Catalog
-from app.domain.product.mixins.pagination import PaginationParams
+from shared.mixins import PaginationParams
 
 
 class IRepository(ABC):

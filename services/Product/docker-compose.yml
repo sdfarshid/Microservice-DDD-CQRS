@@ -14,8 +14,8 @@ services:
       - product_postgres_data:/var/lib/postgresql/data
   product_app:
     build:
-      context: .
-      dockerfile: Dockerfile.dev
+      context: ../
+      dockerfile: Product/Dockerfile.dev
     container_name: product_service_app
     depends_on:
       - product_db
@@ -31,7 +31,8 @@ services:
     ports:
       - "${APP_PORT_PRODUCT}:8000"
     volumes:
-      - .:/app
+      - ./app:/app/app
+      - ../shared:/app/shared
       - ./app/logs:/app/logs
     logging:
       driver: "json-file"

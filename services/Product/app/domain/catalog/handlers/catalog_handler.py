@@ -4,15 +4,14 @@ from typing import List, Tuple, Sequence
 from uuid import UUID
 from fastapi import Depends
 from app.domain.catalog.handlers.interfaces.Icatalog_handler import ICatalogHandler
-from app.domain.catalog.handlers.interfaces.Icommand_handler import TCommand
 from app.domain.catalog.models.catalog import Catalog
 from app.domain.catalog.queries.get_catalog_by_id import GetCatalogByIdQuery
 from app.domain.catalog.queries.get_catalog_by_name import GetCatalogByNameQuery
 from app.domain.catalog.queries.get_catalogs_by_ids import GetCatalogsByIdsQuery
 from app.domain.catalog.queries.list_catalogs import ListCatalogsQuery
-from app.domain.product.commands.delete_product import DeleteProductCommand
 from app.infrastructure.repositories.catalog.catalog_repository import CatalogRepository
 from app.infrastructure.repositories.catalog.interface.Irepository import IRepository
+from shared.domain.product.commands.delete_product import DeleteProductCommand
 
 
 class CatalogHandler(ICatalogHandler):
