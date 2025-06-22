@@ -9,7 +9,7 @@ from shared.domain.company.commands.create_company import CreateCompanyCommand
 from shared.domain.company.commands.update_company import UpdateCompanyRequest
 from shared.mixins.pagination import PaginationParams, get_pagination_params
 
-router = APIRouter(tags=["company"])
+router = APIRouter()
 
 COMPANY_BASE_URL = settings.get_service_url("company")
 

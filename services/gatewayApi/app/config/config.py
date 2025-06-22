@@ -46,6 +46,7 @@ class Settings(BaseSettings):
             "user": self.USER_BASE_URL,
             "auth": self.AUTH_BASE_URL,
             "catalog": self.CATALOG_BASE_URL,
+            "product_catalog": self.PRODUCT_CATALOG_BASE_URL,
             "gateway": self.API_GATEWAY_URL,
         }
         return service_urls.get(service_name, "Unknown service")
@@ -57,6 +58,7 @@ class Settings(BaseSettings):
         self.USER_BASE_URL = f"{self.USER_SERVICE_URL}api/v1/user"
         self.AUTH_BASE_URL = f"{self.USER_SERVICE_URL}api/v1/auth"
         self.CATALOG_BASE_URL = f"{self.CATALOG_SERVICE_URL}api/v1/catalogs"
+        self.PRODUCT_CATALOG_BASE_URL = f"{self.CATALOG_SERVICE_URL}api/v1/productCatalog"
         self.API_GATEWAY_URL = f"{self.API_GATEWAY_URL}api/v1/gateway"
 
 
