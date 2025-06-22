@@ -10,6 +10,7 @@ from app.domain.product.interface.Irepository import IProductRepository
 from app.infrastructure.database.session import get_db
 from app.infrastructure.database.models.product import ProductDBModel
 from app.infrastructure.mappers.product_mapper import ProductMapper
+from app.utilities.log import DebugWaring
 from shared.mixins import PaginationParams
 
 
@@ -52,7 +53,7 @@ class ProductRepository(IProductRepository):
             return None
         return ProductMapper.to_domain(product_db)
 
-    async def list_products(self, pagination: PaginationParams, company_id: [UUID, None]) -> list[Product] | None:
+    async def list_products(self, pagination: PaginationParams, company_id: Optional[UUID] = None) -> list[Product]:
         query = select(ProductDBModel)
         if company_id:
             query = query.where(ProductDBModel.company_id == company_id)
@@ -61,10 +62,16 @@ class ProductRepository(IProductRepository):
 
         result = await self.db.execute(query)
         products_db = result.scalars().all()
-        if products_db is None:
-            return None
 
-        return [ProductMapper.to_domain(product) for product in products_db]
+        products = []
+        for product_db in products_db:
+            try:
+                products.append(ProductMapper.to_domain(product_db))
+            except Exception as e:
+                DebugWaring(f"Error mapping product {product_db.id}: {e}")
+                continue
+
+        return products
 
     async def update_product(self, product_id: UUID, updated_data: dict) -> Product | None:
         try:

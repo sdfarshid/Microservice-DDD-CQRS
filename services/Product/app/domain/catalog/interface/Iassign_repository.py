@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from typing import Sequence, List
 from uuid import UUID
 
-from app.domain.catalog.models.catalog import Catalog
 from app.infrastructure.database.models.catalog_products import CatalogProductDBModel
 
 

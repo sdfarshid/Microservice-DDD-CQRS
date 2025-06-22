@@ -4,11 +4,15 @@ from abc import ABC, abstractmethod
 from typing import Sequence, List
 from uuid import UUID
 
-from app.domain.catalog.models.catalog import Catalog
+from app.domain.catalog.aggregates.catalog import Catalog
 from shared.mixins import PaginationParams
 
 
 class IRepository(ABC):
+
+    @abstractmethod
+    async def save(self, catalog: Catalog) -> Catalog:
+        pass
 
     @abstractmethod
     async def add_catalog(self, catalog: Catalog) -> Catalog:

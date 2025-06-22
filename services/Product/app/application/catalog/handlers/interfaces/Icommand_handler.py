@@ -2,8 +2,6 @@ from abc import ABC, abstractmethod
 from typing import TypeVar, List
 from uuid import UUID
 
-from app.domain.catalog.models.catalog import Catalog
-
 TCommand = TypeVar('TCommand')
 TResult = TypeVar('TResult')
 

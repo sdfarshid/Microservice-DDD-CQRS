@@ -4,12 +4,12 @@ from uuid import UUID
 from fastapi import Depends
 
 from app.application.product.handlers.interfaces.Iproduct_handler import IProductHandler
-from app.application.product.queries.get_product_by_ids import GetProductByIdsQuery
 from app.config.config import settings
 from app.domain.product.aggregates.product import Product
 from app.domain.product.interface.Irepository import IProductRepository
 from app.infrastructure.mappers.product_mapper import ProductMapper
 from app.infrastructure.repositories.product.product_repository import ProductRepository
+from shared.domain.product.queries.GetProductByIdsQuery import GetProductByIdsQuery
 from shared.domain.product.commands.delete_product import DeleteProductCommand
 from shared.domain.product.queries.get_product_by_id import GetProductByIdQuery
 from shared.domain.product.queries.list_products import ListProductsQuery
@@ -19,7 +19,6 @@ class ProductHandler(IProductHandler):
 
     def __init__(self, product_repository: IProductRepository = Depends(ProductRepository)):
         self.repository = product_repository
-        self.company_service_url = settings.COMPANY_SERVICE_URL
 
     async def create(self, command: Product) -> Product:
         try:

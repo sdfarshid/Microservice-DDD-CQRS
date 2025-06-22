@@ -6,9 +6,9 @@ from fastapi import Depends
 from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.domain.catalog.interface.Iassign_repository import IAssignRepository
 from app.infrastructure.database.models.catalog_products import CatalogProductDBModel
 from app.infrastructure.database.session import get_db
-from app.infrastructure.repositories.catalog.interface.Iassign_repository import IAssignRepository
 from app.utilities.log import DebugError
 
 

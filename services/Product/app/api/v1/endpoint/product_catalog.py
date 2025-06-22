@@ -3,11 +3,11 @@ from uuid import UUID
 from functools import wraps
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.domain.catalog.commands.assign_product_to_catalogs import AssignProductToCatalogsCommand
-from app.domain.catalog.commands.update_product_catalogs import UpdateProductCatalogsCommand
-from app.domain.catalog.queries.get_product_catalogs import GetProductCatalogsQuery
-from app.domain.catalog.services.assign_catalog_service import AssignCatalogService
+from app.application.catalog.services.assign_catalog_service import AssignCatalogService
 from app.utilities.log import DebugError
+from shared.domain.catalog.commands.assign_product_to_catalogs import AssignProductToCatalogsCommand
+from shared.domain.catalog.commands.update_product_catalogs import UpdateProductCatalogsCommand
+from shared.domain.catalog.queries.get_product_catalogs import GetProductCatalogsQuery
 
 router = APIRouter()
 

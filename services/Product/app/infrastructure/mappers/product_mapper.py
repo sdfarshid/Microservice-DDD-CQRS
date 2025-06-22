@@ -68,6 +68,7 @@ class ProductMapper:
             description=domain_model.description,
             stock=domain_model.stock,
             status=domain_model.status.value,
+            created_at=domain_model.created_at
         )
 
     @staticmethod

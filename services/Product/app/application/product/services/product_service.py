@@ -6,11 +6,11 @@ from fastapi import Depends
 
 from app.application.product.handlers.interfaces.Iproduct_handler import IProductHandler
 from app.application.product.handlers.product_handler import ProductHandler
-from app.application.product.queries.get_product_by_ids import GetProductByIdsQuery
 from app.config.config import settings
 from app.infrastructure.mappers.product_mapper import ProductMapper
 from app.utilities.log import DebugWaring, DebugError
 
+from shared.domain.product.queries.GetProductByIdsQuery import GetProductByIdsQuery
 from shared.domain.product.commands import CreateProductCommand, UpdateProductCommand, ReserveProductCommand
 from shared.domain.product.commands.delete_product import DeleteProductCommand
 from shared.domain.product.queries import ProductResponse
@@ -23,7 +23,7 @@ class ProductService:
             self,
             product_handler: IProductHandler = Depends(ProductHandler),
     ):
-        self.company_service_url = settings.COMPANY_SERVICE_URL
+        self.gateWay_service_url = settings.GATEWAY_SERVICE_URL
         self.product_handler = product_handler
 
     async def create_product(self, command: CreateProductCommand):
@@ -32,6 +32,8 @@ class ProductService:
 
     async def list_products(self, query: ListProductsQuery) -> list[ProductResponse]:
         listOfProductsDomainModel = await self.product_handler.list(query)
+        if not listOfProductsDomainModel:
+            raise ValueError("No products found")
         return [ProductMapper.to_response(product) for product in listOfProductsDomainModel]
 
     async def get_product(self, query: GetProductByIdQuery) -> Optional[ProductResponse]:
@@ -63,7 +65,7 @@ class ProductService:
         return res
 
     async def _check_company_exists(self, company_id: UUID) -> bool | None | Any:
-        get_company_endpoint = f"{self.company_service_url}api/v1/company/{company_id}"
+        get_company_endpoint = f"{self.gateWay_service_url}api/v1/company/{company_id}"
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(get_company_endpoint, timeout=10.0)

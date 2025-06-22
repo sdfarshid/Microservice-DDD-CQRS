@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     POSTGRES_HOST_PRODUCT: str
     POSTGRES_PORT_PRODUCT: str
     APP_PORT_PRODUCT: str
-    COMPANY_SERVICE_URL: HttpUrl
+    GATEWAY_SERVICE_URL: HttpUrl
 
     @property
     def DATABASE_URL(self) -> PostgresDsn:
