@@ -5,9 +5,6 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from app.domain.catalog.models.catalog import Catalog
-from app.domain.catalog.models.value_objects.catalog_name import CatalogName
-
 
 class AssignProductToCatalogsCommand(BaseModel):
     product_id: UUID
