@@ -7,16 +7,16 @@ from shared.domain.user.commands.auth.auth import RefreshRequest
 from shared.domain.user.commands.auth.login_user import LoginUserRequest
 
 router = APIRouter(tags=["user"])
-User_BASE_URL = settings.get_service_url("user")
+AUTH_BASE_URL = settings.get_service_url("auth")
 
 
 @router.post("/login")
 @handle_exceptions
 async def login(command: LoginUserRequest):
-    DebugWaring(f"{User_BASE_URL}/login",)
+    DebugWaring(f"{AUTH_BASE_URL}/login",)
     return await call_api(
         method="POST",
-        endpoint=f"{User_BASE_URL}/login",
+        endpoint=f"{AUTH_BASE_URL}/login",
         json_data=command.model_dump()
     )
 
@@ -26,6 +26,6 @@ async def login(command: LoginUserRequest):
 async def refresh(command: RefreshRequest):
     return await call_api(
         method="POST",
-        endpoint=f"{User_BASE_URL}/refresh",
+        endpoint=f"{AUTH_BASE_URL}/refresh",
         json_data=command.model_dump()
     )

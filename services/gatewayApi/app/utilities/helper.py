@@ -1,20 +1,22 @@
 from functools import wraps
 from typing import Optional
-
 import httpx
 from fastapi import HTTPException
-
 from app.utilities.log import DebugError, DebugWaring
+from shared.config.settings import share_setting
 
 
 async def call_api(
-                   method: str,
-                   endpoint: str,
-                   json_data: Optional[dict] = None,
-                   params: Optional[dict] = None,
-                   timeout: float = 10.0
-                   ):
+        method: str,
+        endpoint: str,
+        json_data: Optional[dict] = None,
+        params: Optional[dict] = None,
+        timeout: float = 10.0
+):
     full_url = f"{endpoint.lstrip('/')}"
+    headers = {}
+    headers["X-API-Key"] = share_setting.GATEWAY_API_KEY
+
     DebugWaring(full_url)
     DebugWaring(params)
     DebugWaring(json_data)
@@ -25,7 +27,8 @@ async def call_api(
                 method=method.upper(),
                 json=json_data,
                 params=params,
-                timeout=timeout
+                timeout=timeout,
+                headers=headers
             )
             response.raise_for_status()
             return response.json()

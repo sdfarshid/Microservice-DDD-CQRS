@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends
 
 from app.config.config import settings
 from app.utilities.helper import handle_exceptions, call_api
+
+from app.utilities.log import DebugError, DebugWaring
 from shared.domain.user.commands.user.create_user import CreateUserRequest
 from shared.mixins import PaginationParams, get_pagination_params
 
@@ -12,6 +14,7 @@ User_BASE_URL = settings.get_service_url("user")
 @router.post("/create")
 @handle_exceptions
 async def create(command: CreateUserRequest):
+    DebugWaring(command)
     return await call_api(
         method="POST",
         endpoint=f"{User_BASE_URL}/register",

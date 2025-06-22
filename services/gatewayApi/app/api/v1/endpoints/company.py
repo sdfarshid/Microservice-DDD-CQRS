@@ -14,12 +14,12 @@ router = APIRouter(tags=["company"])
 COMPANY_BASE_URL = settings.get_service_url("company")
 
 
-@router.post("/create")
+@router.post("/companies")
 @handle_exceptions
 async def create(command: CreateCompanyCommand):
     return await call_api(
         method="POST",
-        endpoint=f"{COMPANY_BASE_URL}/create",
+        endpoint=f"{COMPANY_BASE_URL}/companies",
         json_data=command.model_dump()
     )
 

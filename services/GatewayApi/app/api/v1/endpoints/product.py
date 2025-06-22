@@ -4,7 +4,6 @@ from fastapi import APIRouter, Request, Depends, HTTPException, Query
 
 from app.config.config import settings
 from app.utilities.log import DebugError, DebugWaring
-
 from app.utilities.helper import handle_exceptions, call_api
 
 router = APIRouter(tags=["product"])
@@ -57,4 +56,4 @@ async def update_product(product_id: UUID, command: dict):
 @router.delete("/{product_id}")
 @handle_exceptions
 async def delete_product(product_id: UUID):
-    return await call_api(method="DELETE", endpoint="{PRODUCT_BASE_URL}/{product_id}")
+    return await call_api(method="DELETE", endpoint=f"{PRODUCT_BASE_URL}/{product_id}")
