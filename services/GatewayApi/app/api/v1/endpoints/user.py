@@ -7,7 +7,7 @@ from app.utilities.log import DebugError, DebugWaring
 from shared.domain.user.commands.user.create_user import CreateUserRequest
 from shared.mixins import PaginationParams, get_pagination_params
 
-router = APIRouter(tags=["user"])
+router = APIRouter()
 User_BASE_URL = settings.get_service_url("user")
 
 

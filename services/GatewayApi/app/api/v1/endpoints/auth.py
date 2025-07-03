@@ -6,7 +6,7 @@ from app.utilities.log import DebugWaring
 from shared.domain.user.commands.auth.auth import RefreshRequest
 from shared.domain.user.commands.auth.login_user import LoginUserRequest
 
-router = APIRouter(tags=["user"])
+router = APIRouter()
 AUTH_BASE_URL = settings.get_service_url("auth")
 
 

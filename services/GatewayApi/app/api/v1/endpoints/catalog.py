@@ -11,7 +11,7 @@ from shared.mixins import PaginationParams, get_pagination_params
 from shared.domain.catalog.queries.catalog_response import CatalogResponse
 from shared.domain.catalog.commands.create_catalog import CreateCatalogCommand
 
-router = APIRouter(tags=["catalog"])
+router = APIRouter()
 
 BASE_URR_ENDPOINT = settings.get_service_url("catalog")
 
