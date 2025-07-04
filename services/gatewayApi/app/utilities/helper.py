@@ -7,19 +7,15 @@ from shared.config.settings import share_setting
 
 
 async def call_api(
-        method: str,
-        endpoint: str,
-        json_data: Optional[dict] = None,
-        params: Optional[dict] = None,
-        timeout: float = 10.0
+    method: str,
+    endpoint: str,
+    json_data: Optional[dict] = None,
+    params: Optional[dict] = None,
+    timeout: float = 10.0
 ):
     full_url = f"{endpoint.lstrip('/')}"
-    headers = {}
-    headers["X-API-Key"] = share_setting.GATEWAY_API_KEY
+    headers = {"X-API-Key": share_setting.GATEWAY_API_KEY}
 
-    DebugWaring(full_url)
-    DebugWaring(params)
-    DebugWaring(json_data)
     try:
         async with httpx.AsyncClient() as client:
             response = await client.request(
@@ -32,18 +28,26 @@ async def call_api(
             )
             response.raise_for_status()
             return response.json()
+
     except httpx.HTTPStatusError as e:
-        DebugError(f"HTTP status error occurred: {e} - {full_url}")
-        raise ValueError(f"HTTP error occurred: {e}")
+        try:
+            error_detail = e.response.json()
+        except Exception:
+            error_detail = e.response.text
+
+        DebugError(f"HTTP {e.response.status_code} from {full_url}: {error_detail}")
+        raise HTTPException(
+            status_code=e.response.status_code,
+            detail=error_detail
+        )
+
     except httpx.RequestError as e:
         DebugError(f"Network error occurred: {e} - {full_url}")
-        raise ValueError(f"Network error occurred: {e}")
-    except ValueError as e:
-        DebugError(f"Invalid JSON response: {e} - {full_url}")
-        raise ValueError(f"Invalid JSON response: {e}")
+        raise HTTPException(status_code=502, detail="Gateway: Network error")
+
     except Exception as e:
         DebugError(f"Unexpected error occurred: {e} - {full_url}")
-        raise ValueError(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Gateway: Internal error")
 
 
 def handle_exceptions(func):
