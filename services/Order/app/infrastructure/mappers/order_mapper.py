@@ -5,9 +5,9 @@ from uuid import UUID
 from app.domain.order.entities.invoice import Invoice
 from app.domain.order.aggregates.order import Order
 from app.domain.order.entities.order_item import OrderItem
-from app.domain.order.enums.invoice_status import InvoiceStatus
-from app.domain.order.enums.item_status import ItemStatus
-from app.domain.order.enums.order_status import OrderStatus
+from shared.domain.order.enums.order_status import OrderStatus
+from shared.domain.order.enums.item_status import ItemStatus
+from shared.domain.order.enums.invoice_status import InvoiceStatus
 from app.domain.order.value_objects.price import Price
 from app.infrastructure.database.models.invoice import InvoiceDBModel
 from app.infrastructure.database.models.order import OrderDBModel
@@ -36,6 +36,17 @@ class OrderMapper:
             price_at_order=item.price_at_order,
             status=item.status.value
         )
+
+    @staticmethod
+    def to_order_item_dict(item: OrderItem, order_id: UUID) -> dict:
+        return {
+            "id": item.id,
+            "order_id": order_id,
+            "product_id": item.product_id,
+            "quantity": item.quantity,
+            "price_at_order": item.price_at_order,
+            "status": item.status.value
+        }
 
     @staticmethod
     def to_invoice_domain(invoice_db: InvoiceDBModel) -> Invoice:
@@ -80,13 +91,13 @@ class OrderMapper:
         return Order(
             id=order_db.id,
             user_id=order_db.user_id,
-            items=order_db.items,
+            items=[OrderMapper.to_order_item_domain(item) for item in order_db.items],
             invoice_id=order_db.invoice_id,
             status=OrderStatus(order_db.status)
         )
 
     @staticmethod
-    def to_order_item_domain(orderItemDBModel : OrderItemDBModel) -> OrderItem:
+    def to_order_item_domain(orderItemDBModel: OrderItemDBModel) -> OrderItem:
         return OrderItem(
             id=orderItemDBModel.id,
             product_id=orderItemDBModel.product_id,
@@ -94,4 +105,3 @@ class OrderMapper:
             price_at_order=orderItemDBModel.price_at_order,
             status=ItemStatus(orderItemDBModel.status)
         )
-

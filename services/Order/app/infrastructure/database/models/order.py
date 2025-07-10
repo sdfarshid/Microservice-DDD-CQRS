@@ -2,7 +2,7 @@ from sqlalchemy import Column, String, DateTime, Float, Integer, UUID, Enum, For
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Relationship
 
-from app.domain.order.enums.order_status import OrderStatus
+from shared.domain.order.enums.order_status import OrderStatus
 from app.infrastructure.database.mixins.audit_mixin import AuditMixin
 from app.infrastructure.database.session import Base
 

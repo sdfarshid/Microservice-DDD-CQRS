@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, Float, Enum, ForeignKey
 from sqlalchemy.orm import Relationship
 
-from app.domain.order.enums.item_status import ItemStatus
+from shared.domain.order.enums.item_status import ItemStatus
 from app.infrastructure.database.mixins.audit_mixin import AuditMixin
 from app.infrastructure.database.session import Base
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
