@@ -2,6 +2,8 @@ import httpx
 from uuid import UUID
 from typing import Dict, Any, Optional
 
+from fastapi import HTTPException
+
 from app.config.config import settings
 from app.utilities.log import DebugError
 
@@ -28,11 +30,10 @@ class GatewayClient:
         )
 
     async def initiate_payment(self, invoice_id):
-        return  await  self.call_api(
+        return await self.call_api(
             method="GET",
             endpoint=f"payment/invoice/{invoice_id}"
         )
-
 
     async def call_api(self,
                        method: str,
@@ -54,8 +55,13 @@ class GatewayClient:
                 response.raise_for_status()
                 return response.json()
         except httpx.HTTPStatusError as e:
-            DebugError(f"HTTP status error occurred: {e} - {full_url}")
-            raise ValueError(f"HTTP error occurred: {e}")
+            status_code = e.response.status_code
+            try:
+                error_detail = e.response.json()
+            except Exception:
+                error_detail = str(e)
+            DebugError(f"[Gateway] {status_code} error from {full_url} - {error_detail}")
+            raise HTTPException(status_code=status_code, detail=error_detail)
         except httpx.RequestError as e:
             DebugError(f"Network error occurred: {e} - {full_url}")
             raise ValueError(f"Network error occurred: {e}")
@@ -65,7 +71,6 @@ class GatewayClient:
         except Exception as e:
             DebugError(f"Unexpected error occurred: {e} - {full_url}")
             raise ValueError(f"Unexpected error: {e}")
-
 
     async def release_reserved_products_batch(self, order_id, item_list):
         json_data = {
@@ -77,5 +82,3 @@ class GatewayClient:
             json_data=json_data,
             endpoint=f"product/release",
         )
-
-
