@@ -3,6 +3,7 @@ uvicorn
 sqlalchemy
 asyncpg>=0.27.0
 alembic
+psycopg2-binary
 pydantic>=2
 pydantic-settings
 passlib
@@ -10,4 +11,4 @@ python-dotenv
 pyjwt[crypto]
 bcrypt
 httpx
-kafka
+kafka-python

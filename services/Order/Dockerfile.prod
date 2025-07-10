@@ -1,24 +1,35 @@
-FROM python:3.10
+# --------- Stage 1: Builder ---------
+FROM python:3.10-slim AS builder
 
-# pycache
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# `requirements.txt`
-COPY ./requirements.txt /app/requirements.txt
+COPY Order/requirements.txt /app/requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
+# --------- Stage 2: Final image ---------
+FROM python:3.10-slim
 
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r /app/requirements.txt
-RUN pip install --no-cache-dir gunicorn
-RUN mkdir -p /app/logs && \
-    chmod -R 777 /app/logs
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
+WORKDIR /app
 
-COPY ./app /app
+# Copy only packages
+COPY --from=builder /usr/local /usr/local
+
+# Copy Project File
+COPY Order /app
+COPY shared /app/shared
+
+# Copy sh file for running  entrypoint
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh && \
+    mkdir -p /app/logs && chmod -R 777 /app/logs
 
 EXPOSE 8000
 
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "--bind", "0.0.0.0:8000"]
+CMD ["/app/entrypoint.sh"]
