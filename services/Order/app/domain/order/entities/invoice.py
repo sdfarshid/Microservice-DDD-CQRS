@@ -1,8 +1,9 @@
 from __future__ import annotations
 from uuid import UUID, uuid4
 from pydantic import BaseModel, Field
-from app.application.mixins.audit_mixin import AuditMixin
-from app.domain.order.enums.invoice_status import InvoiceStatus
+
+from shared.domain.order.enums.invoice_status import InvoiceStatus
+from shared.mixins.audit_mixin import AuditMixin
 from app.domain.order.value_objects.price import Price
 
 

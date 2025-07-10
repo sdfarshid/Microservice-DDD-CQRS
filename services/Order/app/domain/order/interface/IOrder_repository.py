@@ -22,6 +22,10 @@ class IOrderRepository(ABC):
         pass
 
     @abstractmethod
+    async def save(self, orderAggregate: Order) -> Order:
+        pass
+
+    @abstractmethod
     async def get_invoice_by_id(self, invoice_id: UUID) -> Invoice | None:
         pass
 
@@ -32,8 +36,9 @@ class IOrderRepository(ABC):
     @abstractmethod
     async def get_expired_pending_invoices(self) -> List[Invoice]:
         pass
+
     @abstractmethod
-    async def add_order_items_batch(self, order_items: List[OrderItemDBModel]) -> None:
+    async def add_order_items_batch(self, order_id: UUID, order_items: List[OrderItem]) -> None:
         pass
 
     @abstractmethod
